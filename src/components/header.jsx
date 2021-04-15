@@ -12,11 +12,17 @@ export const Header = (props) => {
                 </h1>
                 <p>{props.data ? props.data.paragraph : 'Loading'}</p>
                 <a
-                  href='/#'
+                  href='/signup'
                   className='btn btn-custom btn-lg page-scroll'
                 >
+
                   Đăng ký ngay
                 </a>{' '}
+              </div>
+              <div className='col-md-8 col-md-offset-2 intro-text'>
+                <div>
+                {props.children}
+                </div>
               </div>
             </div>
           </div>
