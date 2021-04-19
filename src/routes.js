@@ -6,6 +6,7 @@ import SignUp from "./views/signUp/signUp";
 import NotFoundPage from "./views/404";
 import DashBoard from "./views/dashboard/dashboard"
 import DomainManage from "./views/domainManage/domainManage"
+import Weakness from "./views/weakness/weakness"
 import "antd/dist/antd.css";
 
 const Routes = () => {
@@ -18,6 +19,7 @@ const Routes = () => {
         <Route exact path="/signup" component={SignUp} />
         <Route exact path="/dashboard" component={DashBoard} />
         <Route exact path="/domain" component={DomainManage} />
+        <Route exact path="/weakness" component={Weakness} />
         {/* <Redirect to="/404" /> */}
       </Switch>
     </>

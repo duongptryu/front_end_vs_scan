@@ -11,7 +11,7 @@ const { SubMenu } = Menu
 
 const Header_ = () => {
   const leftSide = [
-    <h1>🆅 🆂🅲🅰🅽🅽🅴🆁</h1>
+    <h1>VSCANNER</h1>
   ]
 
   const rightContent = [

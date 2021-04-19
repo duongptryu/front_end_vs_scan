@@ -1,12 +1,10 @@
-import "antd/dist/antd.css";
 import { Layout } from "antd";
-import SideBar from "./components/sideBar";
-import Header_ from "./components/header";
-import Footer_ from "./components/footer";
-import Content_ from "./components/content";
-import "./index.css"
+import SideBar from "../dashboard/components/sideBar";
+import Header_ from "../dashboard/components/header";
+import Footer_ from "../dashboard/components/footer";
+import Content_ from "./components/content"
 
-const DashBoard = () => {
+const Weakness = () => {
   return (
     <div>
       <Layout>
@@ -21,4 +19,4 @@ const DashBoard = () => {
   );
 };
 
-export default DashBoard;
+export default Weakness;

@@ -9,7 +9,7 @@ const DomainManage = () => {
     <div>
       <Layout>
         <SideBar></SideBar>
-        <Layout>
+        <Layout style={{ marginLeft: "15%" }}>
           <Header_></Header_>
           <Content_></Content_>
           <Footer_></Footer_>

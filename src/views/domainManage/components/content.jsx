@@ -11,25 +11,26 @@ import {
   Menu,
   Input,
   Form,
-  InputNumber,
-  Radio,
-  Cascader,
+  Switch,
+  notification,
 } from "antd";
 import { useEffect, useState } from "react";
 import "../../dashboard/index.css";
 import {
-  DownOutlined,
   UserOutlined,
-  UnorderedListOutlined,
-  PlusOutlined,
+  FileAddOutlined,
   TableOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  SecurityScanOutlined,
 } from "@ant-design/icons";
-
-import reqwest from "reqwest";
+import { confirmAlert } from "react-confirm-alert";
+import config from "../../../config";
+const axios = require("axios").default;
 // import { render } from "@testing-library/react";
 
 const { Content } = Layout;
-const { Search } = Input;
+const { Search, TextArea } = Input;
 const FormItem = Form.Item;
 
 const formItemLayout = {
@@ -41,84 +42,16 @@ const formItemLayout = {
   },
 };
 
-const handleMenuClick = (record, e) => {
-  const { onDeleteItem, onEditItem } = this.props;
-
-  if (e.key === "1") {
-    onEditItem(record);
-  } else if (e.key === "2") {
-    window.confirm({
-      title: `Are you sure delete this record?`,
-      onOk() {
-        // onDeleteItem(record.id)
-        alert("Đã xóa");
-      },
-    });
-  }
-};
-
-const menu = (
-  <Menu onClick={handleMenuClick}>
-    <Menu.Item key="1" icon={<UserOutlined />}>
-      Update
+const menuAction = (
+  <Menu>
+    <Menu.Item key="1" icon={<SecurityScanOutlined />}>
+      Scan
     </Menu.Item>
-    <Menu.Item key="2" icon={<UserOutlined />}>
-      Delete
+    <Menu.Item key="2" icon={<DeleteOutlined />}>
+      Xóa
     </Menu.Item>
   </Menu>
 );
-
-const columns = [
-  {
-    title: "Thời gian cập nhật",
-    dataIndex: "name",
-    sorter: true,
-    render: (name) => `${name.first} ${name.last}`,
-    width: "20%",
-  },
-  {
-    title: "Domain",
-    dataIndex: "gender",
-    // filters: [
-    //   { text: "Male", value: "male" },
-    //   { text: "Female", value: "female" },
-    // ],
-    sorter: true,
-    width: "20%",
-  },
-  {
-    title: "Ghi chú",
-    dataIndex: "gender",
-    width: "20%",
-  },
-  {
-    title: "Rà quét",
-    dataIndex: "email",
-    width: "10%",
-  },
-  {
-    title: "Xác thực",
-    dataIndex: "phone",
-    width: "20%",
-    sorter: true,
-  },
-  {
-    title: "Tùy chọn",
-    dataIndex: "gender",
-    width: "10%",
-    render: (gender) => {
-      return (
-        <Space>
-          <Dropdown overlay={menu}>
-            <Button type="text" disabled>
-              <UnorderedListOutlined /> <DownOutlined />
-            </Button>
-          </Dropdown>
-        </Space>
-      );
-    },
-  },
-];
 
 const getRandomuserParams = (params) => ({
   results: params.pagination.pageSize,
@@ -133,24 +66,517 @@ const Content_ = () => {
     pageSize: 10,
   });
   const [loading, setLoading] = useState(false);
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [visiableCreate, setVisiableCreate] = useState(false);
+  const [visibleCreate, setVisibleCreate] = useState(false);
+  const [visibleConfirm, setVisibleConfirm] = useState(false);
+  const [idVerify, setIdVerify] = useState();
+  const [selectedRow, setSelectedRow] = useState(true);
 
   useEffect(() => {
     fetch({ pagination });
-  },[]);
+  }, []);
 
   const handleCreateButton = () => {
-    setVisiableCreate(true)
+    setVisibleCreate(true);
   };
 
-  const handleOk = () => {
-    setVisiableCreate(false)
-  }
+  const handleChangeSchedule = (target, p) => {
+    console.log(target.targetId);
+    const token = localStorage.getItem("accessToken");
+    if (token == null || token == "") {
+      window.location = "/signin";
+      return false;
+    }
+    setLoading(true);
+    let data = {};
+    if (p == 1) {
+      data = {
+        daily: [target.targetId],
+      };
+    } else if (p == 2) {
+      data = {
+        weekly: [target.targetId],
+      };
+    } else {
+      data = {
+        monthly: [target.targetId],
+      };
+    }
+
+    axios({
+      method: "POST",
+      url: config.API_URL + config.API_VR + "tasks/target/schedule",
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+      data: data,
+    })
+      .then((res) => {
+        console.log(res);
+        if (res.data.status_code == 0) {
+          notification.open({
+            message: "Thông báo lỗi",
+            description: res.data.msg,
+          });
+          setLoading(false);
+          return false;
+        } else {
+          notification.open({
+            message: "Thông báo",
+            description: res.data.msg,
+          });
+          setLoading(false);
+          setVisibleCreate(false);
+          fetch({ pagination });
+        }
+      })
+      .catch((err) => {
+        notification.open({
+          message: "Thông báo lỗi",
+          description: "Vui lòng thử lại sau",
+        });
+        setVisibleCreate(false);
+        setLoading(false);
+        return false;
+      });
+  };
+
+  const menuPriority = (target) => {
+    if (target.priority == 1) {
+      return (
+        <Menu theme="dark">
+          <Menu.Item
+            key="1"
+            icon={<UserOutlined />}
+            style={{ backgroundColor: "#7B68EE" }}
+            disabled
+          >
+            Hàng ngày
+          </Menu.Item>
+          <Menu.Item
+            key="2"
+            icon={<UserOutlined />}
+            onClick={() => {
+              handleChangeSchedule(target, 2);
+            }}
+          >
+            Hàng tuần
+          </Menu.Item>
+          <Menu.Item
+            key="3"
+            icon={<UserOutlined />}
+            onClick={() => {
+              handleChangeSchedule(target, 3);
+            }}
+          >
+            Hàng tháng
+          </Menu.Item>
+        </Menu>
+      );
+    } else if (target.priority == 2) {
+      return (
+        <Menu theme="dark">
+          <Menu.Item
+            key="1"
+            icon={<UserOutlined />}
+            onClick={() => {
+              handleChangeSchedule(target, 1);
+            }}
+          >
+            Hàng ngày
+          </Menu.Item>
+          <Menu.Item
+            key="2"
+            icon={<UserOutlined />}
+            style={{ backgroundColor: "#7B68EE" }}
+            disabled
+          >
+            Hàng tuần
+          </Menu.Item>
+          <Menu.Item
+            key="3"
+            icon={<UserOutlined />}
+            onClick={() => {
+              handleChangeSchedule(target, 3);
+            }}
+          >
+            Hàng tháng
+          </Menu.Item>
+        </Menu>
+      );
+    } else {
+      return (
+        <Menu theme="dark">
+          <Menu.Item
+            key="1"
+            icon={<UserOutlined />}
+            onClick={() => {
+              handleChangeSchedule(target, 1);
+            }}
+          >
+            Hàng ngày
+          </Menu.Item>
+          <Menu.Item
+            key="2"
+            icon={<UserOutlined />}
+            onClick={() => {
+              handleChangeSchedule(target, 2);
+            }}
+          >
+            Hàng tuần
+          </Menu.Item>
+          <Menu.Item
+            key="3"
+            icon={<UserOutlined />}
+            style={{ backgroundColor: "7B68EE" }}
+            disabled
+          >
+            Hàng tháng
+          </Menu.Item>
+        </Menu>
+      );
+    }
+  };
+
+  const handleAddDomain = (e) => {
+    setLoading(true);
+    const data = document.querySelector("#domains").innerHTML;
+    const arr = data.split(",");
+
+    const token = localStorage.getItem("accessToken");
+    if (token == null || token == "") {
+      window.location = "/signin";
+      return false;
+    }
+
+    axios({
+      method: "POST",
+      url: config.API_URL + config.API_VR + "tasks/target/add",
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+      data: {
+        targets: arr,
+      },
+    })
+      .then((res) => {
+        // const fail = arr.length() - res.data.
+        if (res.data.notTargets.length != 0) {
+          notification.open({
+            message: "Thông báo lỗi",
+            description: "Domain " + res.data.notTargets + " không hợp lệ",
+          });
+          setLoading(false);
+          return false;
+        } else {
+          document.querySelector("#domains").value = " ";
+          notification.open({
+            message: "Thông báo",
+            description: "Thêm domain thành công",
+          });
+          setLoading(false);
+          setVisibleCreate(false);
+          fetch({ pagination });
+        }
+      })
+      .catch((err) => {
+        document.querySelector("#domains").value = " ";
+        console.log(err);
+        notification.open({
+          message: "Thông báo lỗi",
+          description: "Vui lòng thử lại sau",
+        });
+        setVisibleCreate(false);
+        setLoading(false);
+        return false;
+      });
+  };
 
   const handleCancel = () => {
-    setVisiableCreate(false)
-  }
+    setVisibleCreate(false);
+    setVisibleConfirm(false);
+  };
+
+  const handleSwitch = (target) => {
+    console.log(target.targetId);
+    const token = localStorage.getItem("accessToken");
+    if (token == null || token == "") {
+      window.location = "/signin";
+      return false;
+    }
+    setLoading(true);
+    let data = {};
+    if (target.isScan) {
+      data = {
+        disable: [target.targetId],
+      };
+    } else {
+      data = {
+        enable: [target.targetId],
+      };
+    }
+
+    axios({
+      method: "POST",
+      url: config.API_URL + config.API_VR + "tasks/target/scan",
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+      data: data,
+    })
+      .then((res) => {
+        // const fail = arr.length() - res.data.
+        if (res.data.status_code == 0) {
+          notification.open({
+            message: "Thông báo lỗi",
+            description: res.data.msg,
+          });
+          setLoading(false);
+          return false;
+        } else {
+          notification.open({
+            message: "Thông báo",
+            description: res.data.msg,
+          });
+          setLoading(false);
+          setVisibleCreate(false);
+          fetch({ pagination });
+        }
+      })
+      .catch((err) => {
+        notification.open({
+          message: "Thông báo lỗi",
+          description: "Vui lòng thử lại sau",
+        });
+        setVisibleCreate(false);
+        setLoading(false);
+        return false;
+      });
+  };
+
+  const columns = [
+    {
+      title: "Thời gian cập nhật",
+      dataIndex: "updateTime",
+      sorter: true,
+      width: "20%",
+    },
+    {
+      title: "Domain",
+      dataIndex: "target",
+      sorter: true,
+      width: "30%",
+    },
+    {
+      title: "Lập lịch",
+      width: "20%",
+      key: "scanSchedule",
+      sorter: true,
+      render: (target) => {
+        return (
+          <Space>
+            {target.isScan == true && (
+              <Switch
+                checked={true}
+                onClick={() => {
+                  handleSwitch(target);
+                }}
+              />
+            )}
+            {target.isScan == false && (
+              <Switch
+                checked={false}
+                onClick={() => {
+                  handleSwitch(target);
+                }}
+              />
+            )}
+            <Dropdown overlay={menuPriority(target)}>
+              <Button type="text" disabled>
+                <EditOutlined />
+              </Button>
+            </Dropdown>
+          </Space>
+        );
+      },
+    },
+    {
+      title: "Xác thực",
+      width: "10%",
+      sorter: true,
+      render: (target) => {
+        return (
+          <>
+            {target.isVerify == true && (
+              <Button
+                type="text"
+                ghost
+                style={{ backgroundColor: "#00BFFF", color: "white" }}
+                disabled={true}
+              >
+                Đã xác thực
+              </Button>
+            )}
+            {target.isVerify == false && (
+              <Button
+                type="text"
+                ghost
+                style={{
+                  backgroundColor: "gray",
+                  color: "white",
+                  width: "75%",
+                }}
+                onClick={() => {
+                  confirmHandleBtn(target);
+                }}
+              >
+                Xác thực
+              </Button>
+            )}
+          </>
+        );
+      },
+    },
+    {
+      title: "Tùy chọn",
+      width: "20%",
+      render: (target) => {
+        return (
+          <Space>
+            {(target.scanStatus == "processing" ||
+              target.scanStatus == "running") && (
+              <Button type="primary" disabled>
+                <SecurityScanOutlined /> Scan
+              </Button>
+            )}
+            {(target.scanStatus == "pending" ||
+              target.scanStatus == "completed") && (
+              <Button
+                type="primary"
+                onClick={() => {
+                  startScan(target);
+                }}
+              >
+                <SecurityScanOutlined /> Scan
+              </Button>
+            )}
+            <Button
+              type="text"
+              onClick={() => {
+                handleDeleteDomain(target);
+              }}
+            >
+              <DeleteOutlined />
+            </Button>
+          </Space>
+        );
+      },
+    },
+  ];
+
+  const startScan = (target) => {
+    if (!target.isVerify) {
+      alert("Vui lòng xác thực domain để bắt đầu scan.");
+      return false;
+    }
+
+    setLoading(true);
+
+    const token = localStorage.getItem("accessToken");
+    if (token == null || token == "") {
+      window.location = "/signin";
+      return false;
+    }
+
+    axios({
+      method: "POST",
+      url: config.API_URL + config.API_VR + "tasks/scan/start",
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+      data: {
+        targetIds: [target.targetId],
+      },
+    })
+      .then((res) => {
+        console.log(res);
+        if (res.data.targetIds.length == 0) {
+          setLoading(false);
+          notification.open({
+            message: "Thông báo lỗi",
+            description: "Không thành công, vui lòng thử lại sau",
+          });
+          return false;
+        } else {
+          notification.open({
+            message: "Thông báo",
+            description: "Hệ thống đang quét, vui lòng đợi trong giây lát",
+          });
+          fetch({ pagination });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        notification.open({
+          message: "Thông báo",
+          description: "Không thành công",
+        });
+        setLoading(false);
+      });
+  };
+
+  const handleDeleteDomain = (target) => {
+    setLoading(true);
+
+    const token = localStorage.getItem("accessToken");
+    if (token == null || token == "") {
+      window.location = "/signin";
+      return false;
+    }
+
+    axios({
+      method: "POST",
+      url: config.API_URL + config.API_VR + "tasks/target/delete",
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+      data: {
+        targetIds: [target.targetId],
+      },
+    })
+      .then((res) => {
+        if (res.data.targetIds.length != 1) {
+          setLoading(false);
+          notification.open({
+            message: "Thông báo lỗi",
+            description: "Xóa không thành công, vui lòng thử lại sau",
+          });
+          return false;
+        } else {
+          notification.open({
+            message: "Thông báo",
+            description: "Xóa domain thành công",
+          });
+          fetch({ pagination });
+        }
+      })
+      .catch((err) => {
+        notification.open({
+          message: "Thông báo",
+          description: "Hệ thông đang bận, vui lòng thử lại sau",
+        });
+        setLoading(false);
+      });
+  };
 
   const handleTableChange = (pagination, filters, sorter) => {
     fetch({
@@ -161,65 +587,216 @@ const Content_ = () => {
     });
   };
 
-  const fetch = (params = {}) => {
-    setLoading(true);
-    reqwest({
-      url: "https://randomuser.me/api",
-      method: "get",
-      type: "json",
-      data: getRandomuserParams(params),
-    }).then((data) => {
-      console.log(data);
-      setLoading(false);
-      setData(data.results);
-      setPagination({
-        ...params.pagination,
-        total: 200,
-      });
-    });
+  const confirmHandleBtn = (target) => {
+    setVisibleConfirm(true);
+    setIdVerify(target.targetId);
   };
 
-  const onSelectChange = (selectedRowKeys) => {
-    console.log("selectedRowKeys changed: ", selectedRowKeys);
-    setSelectedRowKeys(selectedRowKeys);
+  const fetch = (params = {}) => {
+    setLoading(true);
+
+    const token = localStorage.getItem("accessToken");
+    if (token == null || token == "") {
+      window.location = "/signin";
+      return false;
+    }
+
+    axios({
+      method: "GET",
+      url: config.API_URL + config.API_VR + "tasks/target/all",
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+    })
+      .then((res) => {
+        if (res.data.status_code == 0) {
+          setLoading(false);
+          notification.open({
+            message: "Thông báo lỗi",
+            description: res.data.msg,
+          });
+          return false;
+        } else {
+          setLoading(false);
+          let data = res.data.targets;
+          for (let i = 0; i < data.length; i++) {
+            data[i]["key"] = data[i].targetId;
+          }
+          setData(data);
+          setPagination({
+            ...params.pagination,
+            total: res.data.targets.length,
+          });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        window.location = "/signin";
+        return false;
+      });
+  };
+
+  const handleGetVerifyCode = () => {
+    setLoading(true);
+    const id = idVerify;
+    if (id == null) {
+      notification.open({
+        message: "Thông báo lỗi",
+        description: "Domain is not exist",
+      });
+      return false;
+    }
+    const token = localStorage.getItem("accessToken");
+    if (token == null || token == "") {
+      window.location = "/signin";
+      return false;
+    }
+
+    axios({
+      method: "GET",
+      url:
+        config.API_URL +
+        config.API_VR +
+        "tasks/target/verify/code?targetId=" +
+        id,
+      // mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+    })
+      .then((res) => {
+        if (res.data.status_code == 0) {
+          setLoading(false);
+          notification.open({
+            message: "Thông báo lỗi",
+            description: res.data.msg,
+          });
+          return false;
+        } else {
+          setLoading(false);
+          console.log(res.data.verifyCode);
+          document.querySelector("#displayCode").innerHTML =
+            "Code = " + res.data.verifyCode;
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        window.location = "/signin";
+        return false;
+      });
+  };
+
+  const handleVerify = () => {
+    setLoading(true);
+    const id = idVerify;
+    if (id == null) {
+      notification.open({
+        message: "Thông báo lỗi",
+        description: "Xác thực không thành công, vui lòng thử lại",
+      });
+      return false;
+    }
+    const token = localStorage.getItem("accessToken");
+    if (token == null || token == "") {
+      window.location = "/signin";
+      return false;
+    }
+
+    axios({
+      method: "GET",
+      url:
+        config.API_URL + config.API_VR + "tasks/target/verify?targetId=" + id,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+    })
+      .then((res) => {
+        if (res.data.status_code == 0) {
+          notification.open({
+            message: "Thông báo lỗi",
+            description: res.data.msg,
+          });
+          return false;
+        } else {
+          setLoading(false);
+          console.log(res.data.verifyCode);
+          alert("Xác thực thành công");
+          setVisibleConfirm(false);
+          setVisibleCreate(false);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        notification.open({
+          message: "Thông báo lỗi",
+          description: "Xác thực không thành công, vui lòng thử lại",
+        });
+        setLoading(false);
+        setVisibleConfirm(false);
+        setVisibleCreate(false);
+        return false;
+      });
+  };
+
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+
+  const onSelectChange = (s) => {
+    console.log("selectedRowKeys changed: ", s);
+    setSelectedRowKeys(s);
   };
 
   const rowSelection = {
     selectedRowKeys,
     onChange: onSelectChange,
-    selections: [
-      Table.SELECTION_ALL,
-      Table.SELECTION_INVERT,
-      Table.SELECTION_NONE,
-      {
-        key: "odd",
-        text: "Select Odd Row",
-        onSelect: (changableRowKeys) => {
-          let newSelectedRowKeys = [];
-          newSelectedRowKeys = changableRowKeys.filter((key, index) => {
-            if (index % 2 !== 0) {
-              return false;
-            }
-            return true;
-          });
-          setSelectedRowKeys(newSelectedRowKeys);
-        },
-      },
-      {
-        key: "even",
-        text: "Select Even Row",
-        onSelect: (changableRowKeys) => {
-          let newSelectedRowKeys = [];
-          newSelectedRowKeys = changableRowKeys.filter((key, index) => {
-            if (index % 2 !== 0) {
-              return true;
-            }
-            return false;
-          });
-          setSelectedRowKeys(newSelectedRowKeys);
-        },
-      },
-    ],
+  };
+
+  const handleScanMulti = () => {
+    setLoading(true);
+    if (selectedRowKeys.length <= 0) {
+      notification.open({
+        message: "Thông báo lỗi",
+        description: "Không có đối tượng để scan",
+      });
+      setLoading(false);
+      return false;
+    }
+
+    let data_err = [];
+    selectedRowKeys.forEach((id) => {
+      let x = data.filter((target) => target.targetId == id);
+      if (
+        x[0].scanStatus == "processing" ||
+        x[0].scanStatus == "running" ||
+        x[0].isVerify == false
+      ) {
+        data_err.push(x[0]);
+      }
+    });
+    if (data_err.length > 0) {
+      const name_err = [];
+      data_err.forEach((target) => {
+        name_err.push(target.target);
+      });
+
+      confirmAlert({
+        title: "Confirm to submit",
+        message: "Are you sure to do this.",
+        buttons: [
+          {
+            label: "Yes",
+            onClick: () => alert("Click Yes"),
+          },
+          {
+            label: "No",
+            onClick: () => alert("Click No"),
+          },
+        ],
+      });
+    }
   };
 
   return (
@@ -239,7 +816,28 @@ const Content_ = () => {
           <h1>Danh sách Domain</h1>
           <Row>
             <Col span={8}>
-              <p>Ngày cập nhật cuối 02/04/2021</p>
+              <Space>
+                <p style={{ paddingTop: "10px", marginRight: "10px" }}>
+                  Ngày cập nhật cuối 02/04/2021
+                </p>
+                <Button
+                  size="medium"
+                  type="primary"
+                  icon={<SecurityScanOutlined />}
+                  onClick={handleScanMulti}
+                  disabled={!selectedRowKeys.length > 0}
+                >
+                  Scan
+                </Button>
+                <Button
+                  size="medium"
+                  icon={<DeleteOutlined />}
+                  onClick={handleCreateButton}
+                  disabled={!selectedRowKeys.length > 0}
+                >
+                  Xóa
+                </Button>
+              </Space>
             </Col>
             <Col span={12}>
               <Space>
@@ -256,94 +854,44 @@ const Content_ = () => {
               <Space style={{ marginBottom: 16, float: "right" }}>
                 <Button
                   size="medium"
-                  icon={<PlusOutlined />}
+                  icon={<FileAddOutlined />}
                   onClick={handleCreateButton}
                 >
                   Thêm domain
                 </Button>
-
-                <Modal visible={visiableCreate} title="Thêm mới domain" onOk={handleOk} onCancel={handleCancel}>
-                  <Form name="control-ref" layout="horizontal">
+                <Modal
+                  visible={visibleCreate}
+                  title="Thêm mới domain"
+                  onOk={handleAddDomain}
+                  onCancel={handleCancel}
+                  loading={true}
+                  footer={[
+                    <Button key="back" onClick={handleCancel}>
+                      Hủy
+                    </Button>,
+                    <Button
+                      key="submit"
+                      type="primary"
+                      loading={loading}
+                      onClick={handleAddDomain}
+                    >
+                      Thêm
+                    </Button>,
+                  ]}
+                >
+                  <p>
+                    Trong trường hợp nhập nhiều domain, vui lòng ngăn cách nhau
+                    bởi dấu phẩy (Ví dụ: khonggianmang.vn, tinnhiemmang.vn)
+                  </p>
+                  <Form name="control-ref" layout="horizontal" id="myForm">
                     <FormItem
-                      name="name"
+                      name="domain"
                       rules={[{ required: true }]}
-                      label={`Name`}
+                      label={`Domain`}
                       hasFeedback
                       {...formItemLayout}
                     >
-                      <Input />
-                    </FormItem>
-                    <FormItem
-                      name="nickName"
-                      rules={[{ required: true }]}
-                      label={`NickName`}
-                      hasFeedback
-                      {...formItemLayout}
-                    >
-                      <Input />
-                    </FormItem>
-                    <FormItem
-                      name="isMale"
-                      rules={[{ required: true }]}
-                      label={`Gender`}
-                      hasFeedback
-                      {...formItemLayout}
-                    >
-                      <Radio.Group>
-                        <Radio value>Male</Radio>
-                        <Radio value={false}>Female</Radio>
-                      </Radio.Group>
-                    </FormItem>
-                    <FormItem
-                      name="age"
-                      label={`Age`}
-                      hasFeedback
-                      {...formItemLayout}
-                    >
-                      <InputNumber min={18} max={100} />
-                    </FormItem>
-                    <FormItem
-                      name="phone"
-                      rules={[
-                        {
-                          required: true,
-                          pattern: /^1[34578]\d{9}$/,
-                          message: `The input is not valid phone!`,
-                        },
-                      ]}
-                      label={`Phone`}
-                      hasFeedback
-                      {...formItemLayout}
-                    >
-                      <Input />
-                    </FormItem>
-                    <FormItem
-                      name="email"
-                      rules={[
-                        {
-                          required: true,
-                          pattern: /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/,
-                          message: `The input is not valid E-mail!`,
-                        },
-                      ]}
-                      label={`Email`}
-                      hasFeedback
-                      {...formItemLayout}
-                    >
-                      <Input />
-                    </FormItem>
-                    <FormItem
-                      name="address"
-                      rules={[{ required: true }]}
-                      label={`Address`}
-                      hasFeedback
-                      {...formItemLayout}
-                    >
-                      <Cascader
-                        style={{ width: "100%" }}
-                        // options={}
-                        placeholder={`Pick an address`}
-                      />
+                      <TextArea id="domains" />
                     </FormItem>
                   </Form>
                 </Modal>
@@ -351,10 +899,29 @@ const Content_ = () => {
             </Col>
           </Row>
         </div>
+
+        <Modal
+          visible={visibleConfirm}
+          title="Xác thực domain"
+          onCancel={handleCancel}
+          footer={[
+            <Button key="back" onClick={handleCancel}>
+              Cancle
+            </Button>,
+            <Button key="submit" type="primary" onClick={handleGetVerifyCode}>
+              Lấy mã xác thực
+            </Button>,
+            <Button key="link" type="primary" onClick={handleVerify}>
+              Xác thực
+            </Button>,
+          ]}
+        >
+          <p id="displayCode">Viet cai gi do</p>
+        </Modal>
+
         <Table
           rowSelection={rowSelection}
           columns={columns}
-          rowKey={(record) => record.login.uuid}
           dataSource={data}
           pagination={pagination}
           loading={loading}

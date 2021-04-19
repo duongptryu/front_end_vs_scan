@@ -14,6 +14,12 @@ const SideBar = () => {
   return (
     <>
       <Sider
+        style={{
+          overflow: 'auto',
+          height: '100vh',
+          position: 'fixed',
+          left: 0,
+        }}
         breakpoint="lg"
         collapsedWidth="0"
         onBreakpoint={(broken) => {
@@ -34,10 +40,13 @@ const SideBar = () => {
             <Link to="/dashboard">Dashboard</Link>
           </Menu.Item>
           <Menu.Item key="2" icon={<TableOutlined />}>
-          <Link to="/domain">Quản lý domain</Link>
+            <Link to="/weakness">Quản lý điểm yếu</Link>
+          </Menu.Item>
+          <Menu.Item key="2" icon={<TableOutlined />}>
+            <Link to="/domain">Quản lý domain</Link>
           </Menu.Item>
           <Menu.Item key="3" icon={<UserOutlined />}>
-          <Link to="/user">Người dùng</Link>
+            <Link to="/user">Người dùng</Link>
           </Menu.Item>
           {/* <Menu.Item key="4" icon={<UserOutlined />}>
             nav 4
