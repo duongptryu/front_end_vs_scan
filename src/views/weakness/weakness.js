@@ -3,8 +3,13 @@ import SideBar from "../dashboard/components/sideBar";
 import Header_ from "../dashboard/components/header";
 import Footer_ from "../dashboard/components/footer";
 import Content_ from "./components/content"
+import  { Redirect } from 'react-router-dom'
 
 const Weakness = () => {
+  const token = localStorage.getItem("accessToken")
+  if(token == null || !token){
+    return <Redirect to="/signin"/>
+  }
   return (
     <div>
       <Layout>

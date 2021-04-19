@@ -9,7 +9,7 @@ function NumberCard(props) {
     <Card
     hoverable
       bordered={false}
-      bodyStyle={{ padding: 50, height:"170px" }}
+      bodyStyle={{ padding: 50, height:"170px", backgroundColor:"red" }}
     >
       <span style={{ color, fontSize:"54px", float: "left" }}>
         {icon}

@@ -1,4 +1,4 @@
-import Logo from "../../../assets/img/logo-footer1.png";
+import Logo from "../../../assets/img/logo.png";
 import "antd/dist/antd.css";
 import { Layout, Menu, Image } from "antd";
 import {
@@ -32,7 +32,7 @@ const SideBar = () => {
       >
         <div className="logo">
           <a>
-            <Image width={200} src={Logo} />
+            <Image width={280} src={Logo} />
           </a>
         </div>
         <Menu theme="dark" mode="inline" defaultSelectedKeys={["4"]}>

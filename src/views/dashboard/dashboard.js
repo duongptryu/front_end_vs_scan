@@ -5,8 +5,13 @@ import Header_ from "./components/header";
 import Footer_ from "./components/footer";
 import Content_ from "./components/content";
 import "./index.css"
+import  { Redirect } from 'react-router-dom'
 
 const DashBoard = () => {
+  const token = localStorage.getItem("accessToken")
+  if(token == null || !token){
+    return <Redirect to="/signin"/>
+  }
   return (
     <div>
       <Layout>

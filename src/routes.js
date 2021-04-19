@@ -17,6 +17,7 @@ const Routes = () => {
         <Route exact path="/404" component={NotFoundPage} />
         <Route exact path="/signin" component={SignIn} />
         <Route exact path="/signup" component={SignUp} />
+        
         <Route exact path="/dashboard" component={DashBoard} />
         <Route exact path="/domain" component={DomainManage} />
         <Route exact path="/weakness" component={Weakness} />

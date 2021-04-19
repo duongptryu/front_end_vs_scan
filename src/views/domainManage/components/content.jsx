@@ -298,6 +298,7 @@ const Content_ = () => {
   const handleCancel = () => {
     setVisibleCreate(false);
     setVisibleConfirm(false);
+    setScanPopUp(false);
   };
 
   const handleSwitch = (target) => {
@@ -743,6 +744,9 @@ const Content_ = () => {
   };
 
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [dataScan, setDataScan] = useState([]);
+  const [dataErr, setDataErr] = useState([]);
+  const [scanPopUp, setScanPopUp] = useState(false);
 
   const onSelectChange = (s) => {
     console.log("selectedRowKeys changed: ", s);
@@ -752,6 +756,12 @@ const Content_ = () => {
   const rowSelection = {
     selectedRowKeys,
     onChange: onSelectChange,
+  };
+
+  const setNullData = () => {
+    setDataScan([]);
+    setDataErr([]);
+    setSelectedRowKeys([]);
   };
 
   const handleScanMulti = () => {
@@ -781,22 +791,121 @@ const Content_ = () => {
       data_err.forEach((target) => {
         name_err.push(target.target);
       });
-
-      confirmAlert({
-        title: "Confirm to submit",
-        message: "Are you sure to do this.",
-        buttons: [
-          {
-            label: "Yes",
-            onClick: () => alert("Click Yes"),
-          },
-          {
-            label: "No",
-            onClick: () => alert("Click No"),
-          },
-        ],
-      });
+      setDataScan(selectedRowKeys);
+      setDataErr(name_err);
+      setScanPopUp(true);
+      setLoading(false);
+    } else {
+      scanMulti(selectedRowKeys);
     }
+  };
+
+  const scanMulti = (targetsID) => {
+    console.log(targetsID);
+    setLoading(true);
+    setScanPopUp(false);
+    const token = localStorage.getItem("accessToken");
+    if (token == null || token == "") {
+      window.location = "/signin";
+      return false;
+    }
+
+    if (targetsID.length == 0) {
+      notification.open({
+        message: "Thông báo lỗi",
+        description: "Không tồn tại domain scan, vui lòng thử lại",
+      });
+      setLoading(false);
+      return false;
+    }
+    axios({
+      method: "POST",
+      url: config.API_URL + config.API_VR + "tasks/scan/start",
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+      data: {
+        targetIds: targetsID,
+      },
+    })
+      .then((res) => {
+        console.log(res);
+        if (res.data.targetIds.length == 0) {
+          setLoading(false);
+          notification.open({
+            message: "Thông báo lỗi",
+            description: "Không thành công, vui lòng thử lại sau",
+          });
+          setNullData();
+          return false;
+        } else {
+          notification.open({
+            message: "Thông báo",
+            description: "Hệ thống đang quét, vui lòng đợi",
+          });
+          setNullData();
+          fetch({ pagination });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        notification.open({
+          message: "Thông báo",
+          description: "Không thành công",
+        });
+        setNullData();
+        setLoading(false);
+      });
+  };
+
+  const handleDeleteMulti = () => {
+    setLoading(true);
+
+    const token = localStorage.getItem("accessToken");
+    if (token == null || token == "") {
+      window.location = "/signin";
+      return false;
+    }
+    if (selectedRowKeys.length == 0) {
+      notification.open({
+        message: "Thông báo lỗi",
+        description: "Không tồn tại domain lựa chọn, vui lòng thử lại",
+      });
+      setLoading(false);
+      return false;
+    }
+
+    axios({
+      method: "POST",
+      url: config.API_URL + config.API_VR + "tasks/target/delete",
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+      data: {
+        targetIds: selectedRowKeys,
+      },
+    })
+      .then((res) => {
+        console.log(res);
+        notification.open({
+          message: "Thông báo",
+          description: "Xóa thành công",
+        });
+        setSelectedRowKeys([]);
+        fetch({ pagination });
+      })
+      .catch((err) => {
+        notification.open({
+          message: "Thông báo",
+          description: "Hệ thông đang bận, vui lòng thử lại sau",
+        });
+        setSelectedRowKeys([]);
+        setLoading(false);
+      });
   };
 
   return (
@@ -832,7 +941,7 @@ const Content_ = () => {
                 <Button
                   size="medium"
                   icon={<DeleteOutlined />}
-                  onClick={handleCreateButton}
+                  onClick={handleDeleteMulti}
                   disabled={!selectedRowKeys.length > 0}
                 >
                   Xóa
@@ -917,6 +1026,37 @@ const Content_ = () => {
           ]}
         >
           <p id="displayCode">Viet cai gi do</p>
+        </Modal>
+
+        <Modal
+          visible={scanPopUp}
+          title="Thông báo"
+          onCancel={handleCancel}
+          footer={[
+            <Button key="back" onClick={handleCancel}>
+              Hủy
+            </Button>,
+            <Button
+              key="submit"
+              type="primary"
+              onClick={() => {
+                scanMulti(dataScan);
+              }}
+            >
+              Quét
+            </Button>,
+          ]}
+        >
+          <p>
+            <b>Domain không thể scan:</b>
+            <ul>
+              {dataErr.map((name, index) => {
+                return <li key={index}>{name}</li>;
+              })}
+            </ul>
+            <br></br>
+            <b>Bạn có muốn tiếp tục quét.</b>
+          </p>
         </Modal>
 
         <Table

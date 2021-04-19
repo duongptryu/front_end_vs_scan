@@ -1,6 +1,11 @@
 // import "antd/dist/antd.css";
 import { Row, Col, Divider, DatePicker, Space } from "antd";
-import { BulbOutlined, DashboardOutlined } from "@ant-design/icons";
+import {
+  BulbOutlined,
+  DashboardOutlined,
+  FileSearchOutlined,
+  ExclamationOutlined,
+} from "@ant-design/icons";
 import NumberCard from "./card";
 import TableWkn from "./tableWkn";
 import TableDomain from "./tableDomain";
@@ -21,15 +26,15 @@ const Content_ = () => {
       <Row gutter={[48, 16]} justify="center">
         <Col span={6}>
           <NumberCard
-            icon={<BulbOutlined />}
+            icon={<FileSearchOutlined />}
             color="blue"
             title="Test"
-          ></NumberCard>
+            ></NumberCard>
         </Col>
         <Col span={6}>
           <NumberCard
-            icon={<BulbOutlined />}
-            color="blue"
+            icon={<ExclamationOutlined />}
+            color="red"
             title="Test"
           ></NumberCard>
         </Col>
