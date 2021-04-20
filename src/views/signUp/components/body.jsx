@@ -6,10 +6,10 @@ const BodySignUp = (props) => {
   return (
     <Header data={props.data}>
         <div className="body">
-       <h1>
+       <h1 style = {{size: "10px"}}>
            Đăng Ký
        </h1>
-      <FormSignUp></FormSignUp>
+      <FormSignUp style = {{color: "white"}}></FormSignUp>
       </div>
     </Header>
   );

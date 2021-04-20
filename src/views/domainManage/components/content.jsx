@@ -417,7 +417,11 @@ const Content_ = () => {
               <Button
                 type="text"
                 ghost
-                style={{ backgroundColor: "#00BFFF", color: "white" }}
+                style={{ 
+                  backgroundColor: "#00BFFF", 
+                  color: "white",
+                  width: "100%",
+                }}
                 disabled={true}
               >
                 Đã xác thực
@@ -430,22 +434,24 @@ const Content_ = () => {
                 style={{
                   backgroundColor: "gray",
                   color: "white",
-                  width: "75%",
+                  width: "100%",
                 }}
                 onClick={() => {
                   confirmHandleBtn(target);
                 }}
               >
-                Xác thực
+                 Xác thực 
               </Button>
             )}
           </>
         );
       },
     },
+    {},
+    {},
     {
       title: "Tùy chọn",
-      width: "20%",
+      width: "15%",
       render: (target) => {
         return (
           <Space>
@@ -924,43 +930,8 @@ const Content_ = () => {
         <div style={{ marginBottom: "20px" }}>
           <h1>Danh sách Domain</h1>
           <Row>
-            <Col span={8}>
-              <Space>
-                <p style={{ paddingTop: "10px", marginRight: "10px" }}>
-                  Ngày cập nhật cuối 02/04/2021
-                </p>
-                <Button
-                  size="medium"
-                  type="primary"
-                  icon={<SecurityScanOutlined />}
-                  onClick={handleScanMulti}
-                  disabled={!selectedRowKeys.length > 0}
-                >
-                  Scan
-                </Button>
-                <Button
-                  size="medium"
-                  icon={<DeleteOutlined />}
-                  onClick={handleDeleteMulti}
-                  disabled={!selectedRowKeys.length > 0}
-                >
-                  Xóa
-                </Button>
-              </Space>
-            </Col>
-            <Col span={12}>
-              <Space>
-                <Search
-                  placeholder="input search text"
-                  enterButton="Search"
-                  size="medium"
-                  width="200px"
-                />
-                <Button style={{ marginLeft: "10px" }}>Reset</Button>
-              </Space>
-            </Col>
-            <Col span={4}>
-              <Space style={{ marginBottom: 16, float: "right" }}>
+          <Col span={3.5} style={{display: "flex"}}>
+              <Space style={{float: "right" }}>
                 <Button
                   size="medium"
                   icon={<FileAddOutlined />}
@@ -1004,6 +975,41 @@ const Content_ = () => {
                     </FormItem>
                   </Form>
                 </Modal>
+              </Space>
+            </Col>
+            <Col span={14}>
+              <Space>
+                {/* <p style={{ paddingTop: "10px", marginRight: "10px" }}>
+                  Ngày cập nhật cuối 02/04/2021
+                </p> */}
+                <Button
+                  size="medium"
+                  type="primary"
+                  icon={<SecurityScanOutlined />}
+                  onClick={handleScanMulti}
+                  disabled={!selectedRowKeys.length > 0}
+                >
+                  Scan
+                </Button>
+                <Button
+                  size="medium"
+                  icon={<DeleteOutlined />}
+                  onClick={handleDeleteMulti}
+                  disabled={!selectedRowKeys.length > 0}
+                >
+                  Xóa
+                </Button>
+              </Space>
+            </Col>
+            <Col span={6} style={{display: "flex"}}>
+              <Space  style={{float: "right" }}>
+                <Search
+                  placeholder="input search text"
+                  enterButton="Search"
+                  size="medium"
+                  width="200px"
+                />
+                {/* <Button style={{ marginLeft: "10px" }}>Reset</Button> */}
               </Space>
             </Col>
           </Row>

@@ -11,6 +11,7 @@
     "axios": "^0.21.1",
     "emailjs-com": "^2.6.4",
     "mdbreact": "^5.0.1",
+    "package.json": "^2.0.1",
     "react": "^17.0.1",
     "react-bootstrap": "^1.5.2",
     "react-confirm-alert": "^2.7.0",

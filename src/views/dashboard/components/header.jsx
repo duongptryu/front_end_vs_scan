@@ -38,7 +38,7 @@ const Header_ = () => {
   return (
       <Header
         className="site-layout-sub-header-background"
-        style={{ padding: 0, borderBottom:"solid gray 2px", height: "8vh" }}
+        style={{ padding: 0, borderBottom:"solid gray 2px", height: "12vh" }}
       >
 
         <div style={{position:"absolute", marginLeft:"5%", marginTop:"10px"}}>{leftSide}</div>
