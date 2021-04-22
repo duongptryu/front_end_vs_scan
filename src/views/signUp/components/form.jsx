@@ -53,7 +53,7 @@ const FormSignUp = () => {
       .catch((err) => {
         notification.open({
           message: "Thông báo lỗi",
-          description: err.response.msg,
+          description: "Hệ thống đang lỗi, vui lòng thử lại sau",
         });
         setLoading(false);
       });
@@ -68,7 +68,7 @@ const FormSignUp = () => {
         onFinish={handleSubmit}
       >
         <Form.Item
-          label="Địa chỉ email"
+        label={<label style={{ color: "white" }}>Địa chỉ email</label>}
           name="email"
           rules={[
             {
@@ -82,35 +82,35 @@ const FormSignUp = () => {
         </Form.Item>
 
         <Form.Item
-          label="Mật khẩu"
+        label={<label style={{ color: "white" }}>Mật khẩu</label>}
           name="password"
           rules={[{ required: true, message: "Vui lòng nhập mật khẩu" }]}
         >
           <Input.Password />
         </Form.Item>
         <Form.Item
-          label="Nhập lại mật khẩu"
+        label={<label style={{ color: "white" }}>Nhập lại mật khẩu</label>}
           name="confirmPassword"
           rules={[{ required: true, message: "Vui lòng nhập mật khẩu!" }]}
         >
           <Input.Password />
         </Form.Item>
         <Form.Item
-          label="Họ và tên"
+        label={<label style={{ color: "white" }}>Họ và tên</label>}
           name="fullName"
           rules={[{ required: false }]}
         >
           <Input />
         </Form.Item>
         <Form.Item
-          label="Số điện thoại"
+        label={<label style={{ color: "white" }}>Số điện thoại</label>}
           name="phone"
           rules={[{ required: false }]}
         >
           <Input />
         </Form.Item>
         <Form.Item
-          label="Địa chỉ"
+        label={<label style={{ color: "white" }}>Địa chỉ</label>}
           name="address"
           rules={[{ required: false, type: "string" }]}
         >

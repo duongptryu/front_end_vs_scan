@@ -1,59 +1,111 @@
 // import "antd/dist/antd.css";
-import { Table } from "antd";
+import { Table, notification } from "antd";
 import { useEffect, useState } from "react";
 import "../../dashboard/index.css";
+import config from "../../../config";
+const axios = require("axios").default;
 
-import reqwest from "reqwest";
 
-const getRandomuserParams = (params) => ({
-  results: params.pagination.pageSize,
-  page: params.pagination.current,
-  ...params,
-});
-
-const TableWkn = () => {
+const TableWkn = (props) => {
   const [data, setData] = useState([]);
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
   });
   const [loading, setLoading] = useState(false);
+  const [count, setCount] = useState(1)
+
+  const [time, setTime] = useState({
+    timeStart: props.time.timeStart,
+    timeEnd: props.time.timeEnd,
+  });
 
   useEffect(() => {
-    fetch({ pagination });
+    fetch({time,pagination});
   }, []);
+
+  const fetch = (params = {}) => {
+    setLoading(true);
+    const token = localStorage.getItem("accessToken");
+    if (token == null || token == "") {
+      window.location = "/signin";
+      return false;
+    }
+
+    axios({
+      method: "GET",
+      url:
+        config.API_URL +
+        config.API_VR +
+        `tasks/vulns/overviews?timeStart=${params.time.timeStart}&timeEnd=${params.time.timeEnd}`,
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+    })
+      .then((res) => {
+        let data_res = []
+        for(var key in res.data.overviews.vulns){
+          data_res.push(res.data.overviews.vulns[key])
+        }
+        setData(data_res);
+        setLoading(false);
+        setPagination({
+          ...params.pagination,
+          total: data_res.length,
+        });
+      })
+      .catch((err) => {
+        setLoading(false);
+        setData([]);
+        notification.open({
+          message: "Thông báo lỗi",
+          description: "Vui lòng thử lại sau",
+        });
+      });
+  };
+
+  var x = 1
 
   const columns = [
     {
+      title: 'STT',
+      key: 'index',
+      width:"5%",
+      render: () => {
+        return x++
+      },
+    },
+    {
       title: "Mức độ",
-      dataIndex: "name",
+      dataIndex: "risk",
       sorter: true,
-      render: (name) => `${name.first} ${name.last}`,
-      width: "20%",
+      width: "10%",
     },
     {
       title: "Tên điểm yếu",
-      dataIndex: "gender",
-      // filters: [
-      //   { text: "Male", value: "male" },
-      //   { text: "Female", value: "female" },
-      // ],
+      dataIndex: "pluginName",
       sorter: true,
-      width: "20%",
+      width: "40%",
+    },
+    {
+      title: "cwe",
+      dataIndex: "cwe",
+      width: "10%",
+      sorter: true,
     },
     {
       title: "Số domain bị ảnh hưởng",
-      dataIndex: "phone",
-      width: "20%",
+      dataIndex: "countDomain",
+      width: "15%",
       sorter: true,
-      render: (phone) => {
-        return <p>Running</p>;
-      },
     },
   ];
 
   const handleTableChange = (pagination, filters, sorter) => {
     fetch({
+      time,
       sortField: sorter.field,
       sortOrder: sorter.order,
       pagination,
@@ -61,28 +113,9 @@ const TableWkn = () => {
     });
   };
 
-  const fetch = (params = {}) => {
-    setLoading(true);
-    reqwest({
-      url: "https://randomuser.me/api",
-      method: "get",
-      type: "json",
-      data: getRandomuserParams(params),
-    }).then((data) => {
-      console.log(data);
-      setLoading(false);
-      setData(data.results);
-      setPagination({
-        ...params.pagination,
-        total: 200,
-      });
-    });
-  };
-
   return (
     <Table
       columns={columns}
-      rowKey={(record) => record.login.uuid}
       dataSource={data}
       pagination={pagination}
       loading={loading}

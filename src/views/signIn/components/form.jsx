@@ -37,19 +37,19 @@ const FormSignIn = () => {
           setLoading(false);
           return false;
         } else {
-          const accessToken = res.data.accessToken
-          localStorage.setItem("accessToken", accessToken)
+          const accessToken = res.data.accessToken;
+          localStorage.setItem("accessToken", accessToken);
           alert("Đăng nhập thành công");
           setLoading(false);
           window.location.href = "/dashboard";
         }
       })
       .catch((err) => {
-        console.log(err)
-        // notification.open({
-        //   message: "Thông báo lỗi",
-        //   description: err.response.msg,
-        // });
+        console.log(err);
+        notification.open({
+          message: "Thông báo lỗi",
+          description: "Hệ thống đang lỗi, vui lòng thử lại sau",
+        });
         setLoading(false);
       });
   };
@@ -63,7 +63,7 @@ const FormSignIn = () => {
         onFinish={handleSubmit}
       >
         <Form.Item
-          label="Địa chỉ email"
+          label={<label style={{ color: "white" }}>Địa chỉ email</label>}
           name="email"
           rules={[
             {
@@ -77,7 +77,7 @@ const FormSignIn = () => {
         </Form.Item>
 
         <Form.Item
-          label="Mật khẩu"
+          label={<label style={{ color: "white" }}>Mật khẩu</label>}
           name="password"
           rules={[{ required: true, message: "Vui lòng nhập mật khẩu" }]}
         >

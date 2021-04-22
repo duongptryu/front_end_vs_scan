@@ -1,6 +1,6 @@
 const config = {
     API_VR: "/",
-    API_URL: "http://localhost:8000",
+    API_URL: "http://4b663da3b584.ngrok.io",
 }
 
 

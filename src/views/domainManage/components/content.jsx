@@ -24,7 +24,6 @@ import {
   DeleteOutlined,
   SecurityScanOutlined,
 } from "@ant-design/icons";
-import { confirmAlert } from "react-confirm-alert";
 import config from "../../../config";
 const axios = require("axios").default;
 // import { render } from "@testing-library/react";
@@ -1009,7 +1008,6 @@ const Content_ = () => {
                   size="medium"
                   width="200px"
                 />
-                {/* <Button style={{ marginLeft: "10px" }}>Reset</Button> */}
               </Space>
             </Col>
           </Row>

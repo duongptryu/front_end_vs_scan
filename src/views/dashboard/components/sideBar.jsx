@@ -45,12 +45,9 @@ const SideBar = () => {
           <Menu.Item key="2" icon={<TableOutlined />}>
             <Link to="/domain">Quản lý domain</Link>
           </Menu.Item>
-          <Menu.Item key="3" icon={<UserOutlined />}>
-            <Link to="/user">Người dùng</Link>
+          <Menu.Item key="2" icon={<TableOutlined />}>
+            <Link to="/detail">Detail</Link>
           </Menu.Item>
-          {/* <Menu.Item key="4" icon={<UserOutlined />}>
-            nav 4
-          </Menu.Item> */}
         </Menu>
       </Sider>
     </>

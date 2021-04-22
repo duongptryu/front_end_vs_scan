@@ -50,7 +50,7 @@ const Content_ = () => {
                     setTable("TableDomain")
                   }}
                 >
-                  Theo điểm yếu
+                  Theo domain
                 </Button>
                 <Button
                   size="medium"
@@ -61,22 +61,6 @@ const Content_ = () => {
                 >
                   Theo lỗ hổng
                 </Button>
-              </Space>
-            </Col>
-            <Col span={12}>
-              <Space>
-                <Search
-                  placeholder="Tìm kiếm"
-                  enterButton="Search"
-                  size="medium"
-                  width="200px"
-                />
-                <Button style={{ marginLeft: "10px" }}>Reset</Button>
-              </Space>
-            </Col>
-            <Col span={4}>
-              <Space style={{ marginBottom: 16, float: "right" }} size={12}>
-                <RangePicker />
               </Space>
             </Col>
           </Row>

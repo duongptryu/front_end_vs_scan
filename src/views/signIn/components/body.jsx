@@ -6,7 +6,7 @@ const BodySignIn = (props) => {
   return (
     <Header data={props.data}>
         <div className="body">
-       <h1>
+       <h1 style={{fontSize:"55px"}}>
            Đăng Nhập
        </h1>
       <FormSignIn></FormSignIn>
