@@ -1,10 +1,9 @@
 // import "antd/dist/antd.css";
-import { Table, notification } from "antd";
+import { Table, notification, Button } from "antd";
 import { useEffect, useState } from "react";
 import "../../dashboard/index.css";
 import config from "../../../config";
 const axios = require("axios").default;
-
 
 const TableWkn = (props) => {
   const [data, setData] = useState([]);
@@ -13,7 +12,6 @@ const TableWkn = (props) => {
     pageSize: 10,
   });
   const [loading, setLoading] = useState(false);
-  const [count, setCount] = useState(1)
 
   const [time, setTime] = useState({
     timeStart: props.time.timeStart,
@@ -21,7 +19,7 @@ const TableWkn = (props) => {
   });
 
   useEffect(() => {
-    fetch({time,pagination});
+    fetch({ time, pagination });
   }, []);
 
   const fetch = (params = {}) => {
@@ -45,9 +43,9 @@ const TableWkn = (props) => {
       },
     })
       .then((res) => {
-        let data_res = []
-        for(var key in res.data.overviews.vulns){
-          data_res.push(res.data.overviews.vulns[key])
+        let data_res = [];
+        for (var key in res.data.overviews.vulns) {
+          data_res.push(res.data.overviews.vulns[key]);
         }
         setData(data_res);
         setLoading(false);
@@ -66,15 +64,15 @@ const TableWkn = (props) => {
       });
   };
 
-  var x = 1
+  var x = 1;
 
   const columns = [
     {
-      title: 'STT',
-      key: 'index',
-      width:"5%",
+      title: "STT",
+      key: "index",
+      width: "5%",
       render: () => {
-        return x++
+        return x++;
       },
     },
     {
@@ -82,6 +80,45 @@ const TableWkn = (props) => {
       dataIndex: "risk",
       sorter: true,
       width: "10%",
+      render: (risk) => {
+        if (risk == "High") {
+          return (
+            <Button
+              type="text"
+              style={{ backgroundColor: "#ff6666", color: "white", width:"90%" }}
+            >
+              {risk}
+            </Button>
+          );
+        } else if (risk == "Medium") {
+          return (
+            <Button
+              type="text"
+              style={{ backgroundColor: "#ffd633", color: "white", width:"90%"  }}
+            >
+              {risk}
+            </Button>
+          );
+        } else if (risk == "Low") {
+          return (
+            <Button
+              type="text"
+              style={{ backgroundColor: "#66ff33", color: "white", width:"90%"  }}
+            >
+              {risk}
+            </Button>
+          );
+        } else {
+          return (
+            <Button
+              type="text"
+              style={{ backgroundColor: "#3399ff", color: "white", width:"90%"  }}
+            >
+              {risk}
+            </Button>
+          );
+        }
+      },
     },
     {
       title: "Tên điểm yếu",

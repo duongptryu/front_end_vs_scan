@@ -1,7 +1,8 @@
 import "./body.css";
 import { Form, Input, Button, notification } from "antd";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import config from "../../../config";
+import UserContext from "../../../contexts/user/userContext"
 
 const axios = require("axios").default;
 
@@ -15,6 +16,8 @@ const tailLayout = {
 
 const FormSignIn = () => {
   const [loading, setLoading] = useState(false);
+  const { user, setUser } = useContext(UserContext)
+  console.log(user)
 
   const handleSubmit = (e) => {
     setLoading(true);

@@ -4,7 +4,7 @@ import Header_ from "../dashboard/components/header";
 import Footer_ from "../dashboard/components/footer";
 import  { Redirect } from 'react-router-dom'
 
-const Detail = () => {
+const DetailVuln = () => {
   const token = localStorage.getItem("accessToken")
   if(token == null || !token){
     return <Redirect to="/signin"/>
@@ -22,4 +22,4 @@ const Detail = () => {
   );
 };
 
-export default Detail;
+export default DetailVuln;

@@ -15,6 +15,7 @@ import {
   notification,
 } from "antd";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom"
 import "../../dashboard/index.css";
 import {
   UserOutlined,
@@ -368,9 +369,11 @@ const Content_ = () => {
     },
     {
       title: "Domain",
-      dataIndex: "target",
       sorter: true,
       width: "30%",
+      render: (target) => {
+        return <Link to={"/detail-domain/"+target.targetId}>{target.target}</Link>
+      }
     },
     {
       title: "Lập lịch",

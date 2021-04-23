@@ -98,7 +98,7 @@ const TableDomain = (props) => {
           <Space>
             <Button
               type="text"
-              style={{ backgroundColor: "#ff6666", color: "white" }}
+              style={{ backgroundColor: "#ff6666", color: "white"}}
             >
               {target.overview.high}
             </Button>
