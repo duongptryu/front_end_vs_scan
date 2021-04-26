@@ -8,6 +8,8 @@ import DashBoard from "./views/dashboard/dashboard";
 import DomainManage from "./views/domainManage/domainManage";
 import Weakness from "./views/weakness/weakness";
 import DetailDomain from "./views/detail/detailDomain";
+import DetailVuln from "./views/detail/detailVuln";
+import User from "./views/user/user";
 import "antd/dist/antd.css";
 import UserContext from "./contexts/user/userContext";
 
@@ -26,7 +28,9 @@ const Routes = () => {
           <Route exact path="/dashboard" component={DashBoard} />
           <Route exact path="/domain" component={DomainManage} />
           <Route exact path="/weakness" component={Weakness} />
-          <Route exact path="/detail-domain/:id" component={DetailDomain} />
+          <Route exact path="/detail-domain/:id/:time?" component={DetailDomain} />
+          <Route exact path="/detail-vuln/:vulnID/:id?" component={DetailVuln} />
+          <Route exact path="/user/me" component={User} />
           {/* <Redirect to="/404" /> */}
         </UserContext.Provider>
       </Switch>

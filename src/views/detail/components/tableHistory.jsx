@@ -2,8 +2,10 @@
 import { Table, notification } from "antd";
 import { useEffect, useState, useContext } from "react";
 import config from "../../../config";
-import detailDomainContext from "../../../contexts/detailDomain/detailDomainContext"
+import { Link } from "react-router-dom";
+import detailDomainContext from "../../../contexts/detailDomain/detailDomainContext";
 const axios = require("axios").default;
+
 
 const TableHistory = () => {
   const { id } = useContext(detailDomainContext);
@@ -44,21 +46,31 @@ const TableHistory = () => {
       },
     })
       .then((res) => {
+        console.log(res)
+        if (res.data.scanHistory.length == 0) {
+          setLoading(false);
+          notification.open({
+            message: "Thông báo",
+            description: "Không có dữ liẹu",
+          });
+          return false;
+        }
         setData(res.data.scanHistory);
         setLoading(false);
         setPagination({
           ...params.pagination,
-          total:res.data.hostVulns.vulns.length,
+          total: res.data.scanHistory.length,
         });
+        return false;
       })
       .catch((err) => {
-        //   console.log(err)
+        console.log(err);
         setLoading(false);
-        // setData([]);
-        // notification.open({
-        //   message: "Thông báo lỗi",
-        //   description: "Vui lòng thử lại sau",
-        // });
+        setData([]);
+        notification.open({
+          message: "Thông báo",
+          description: "Vui lòng thử lại sau",
+        });
       });
   };
 
@@ -69,40 +81,35 @@ const TableHistory = () => {
       title: "STT",
       key: "index",
       width: "5%",
-      render: () => {
-        return x++;
+      render: (target) => {
+        return <a href={"/detail-domain/" + id + "/" + target.startTime}>{x++}</a>
+
       },
     },
     {
       title: "Ngày bắt đầu",
-      dataIndex: "startTime",
       sorter: true,
       width: "20%",
-      render: (startTime) => {
-          return convertDate(startTime)
-      }
+      render: (target) => {
+        return <a href={"/detail-domain/" + id + "/" + target.startTime}>{convertDate(target.startTime)}</a>
+      },
     },
     {
       title: "Ngày kết thúc",
-      dataIndex: "endTime",
       width: "20%",
       sorter: true,
-      render: (endTime) => {
-        return convertDate(endTime)
-    }
+      render: (target) => {
+       return <a href={"/detail-domain/" + id + "/" + target.startTime}>{convertDate(target.endTime)}</a>
+      },
     },
     {
       title: "Trạng thái",
-      dataIndex: "scanStatus",
       width: "10%",
       sorter: true,
-    },
-    {
-      title: "Số lỗ hổng",
-    //   dataIndex: "count",
-      width: "20%",
-      sorter: true,
-    },
+      render : (target) => {
+        return <a href={"/detail-domain/" + id + "/" + target.startTime}>{target.scanStatus}</a>
+      }
+    }
   ];
 
   const handleTableChange = (pagination, filters, sorter) => {

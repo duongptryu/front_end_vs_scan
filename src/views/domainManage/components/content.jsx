@@ -15,7 +15,7 @@ import {
   notification,
 } from "antd";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom"
+import { Link } from "react-router-dom";
 import "../../dashboard/index.css";
 import {
   UserOutlined,
@@ -82,10 +82,7 @@ const Content_ = () => {
   const handleChangeSchedule = (target, p) => {
     console.log(target.targetId);
     const token = localStorage.getItem("accessToken");
-    if (token == null || token == "") {
-      window.location = "/signin";
-      return false;
-    }
+    checkToken(token)
     setLoading(true);
     let data = {};
     if (p == 1) {
@@ -245,10 +242,7 @@ const Content_ = () => {
     const arr = data.split(",");
 
     const token = localStorage.getItem("accessToken");
-    if (token == null || token == "") {
-      window.location = "/signin";
-      return false;
-    }
+    checkToken(token)
 
     axios({
       method: "POST",
@@ -304,10 +298,7 @@ const Content_ = () => {
   const handleSwitch = (target) => {
     console.log(target.targetId);
     const token = localStorage.getItem("accessToken");
-    if (token == null || token == "") {
-      window.location = "/signin";
-      return false;
-    }
+    checkToken(token)
     setLoading(true);
     let data = {};
     if (target.isScan) {
@@ -372,8 +363,10 @@ const Content_ = () => {
       sorter: true,
       width: "30%",
       render: (target) => {
-        return <Link to={"/detail-domain/"+target.targetId}>{target.target}</Link>
-      }
+        return (
+          <Link to={"/detail-domain/" + target.targetId}>{target.target}</Link>
+        );
+      },
     },
     {
       title: "Lập lịch",
@@ -419,8 +412,8 @@ const Content_ = () => {
               <Button
                 type="text"
                 ghost
-                style={{ 
-                  backgroundColor: "#00BFFF", 
+                style={{
+                  backgroundColor: "#00BFFF",
                   color: "white",
                   width: "100%",
                 }}
@@ -442,7 +435,7 @@ const Content_ = () => {
                   confirmHandleBtn(target);
                 }}
               >
-                 Xác thực 
+                Xác thực
               </Button>
             )}
           </>
@@ -497,10 +490,7 @@ const Content_ = () => {
     setLoading(true);
 
     const token = localStorage.getItem("accessToken");
-    if (token == null || token == "") {
-      window.location = "/signin";
-      return false;
-    }
+    checkToken(token)
 
     axios({
       method: "POST",
@@ -545,10 +535,7 @@ const Content_ = () => {
     setLoading(true);
 
     const token = localStorage.getItem("accessToken");
-    if (token == null || token == "") {
-      window.location = "/signin";
-      return false;
-    }
+    checkToken(token)
 
     axios({
       method: "POST",
@@ -605,10 +592,7 @@ const Content_ = () => {
     setLoading(true);
 
     const token = localStorage.getItem("accessToken");
-    if (token == null || token == "") {
-      window.location = "/signin";
-      return false;
-    }
+    checkToken(token)
 
     axios({
       method: "GET",
@@ -641,10 +625,29 @@ const Content_ = () => {
         }
       })
       .catch((err) => {
-        console.log(err);
-        window.location = "/signin";
-        return false;
+        checkError(err)
       });
+  };
+
+  const checkError = (err) => {
+    if (err.response.status == 401) {
+      window.location = "/signin";
+      return false;
+    } else {
+      setLoading(false);
+      notification.open({
+        message: "Thông báo lỗi",
+        description: err.response.data,
+      });
+      return false;
+    }
+  };
+
+  const checkToken = (token) => {
+    if (token == null || token == "") {
+      window.location = "/signin";
+      return false;
+    }
   };
 
   const handleGetVerifyCode = () => {
@@ -658,10 +661,7 @@ const Content_ = () => {
       return false;
     }
     const token = localStorage.getItem("accessToken");
-    if (token == null || token == "") {
-      window.location = "/signin";
-      return false;
-    }
+    checkToken(token)
 
     axios({
       method: "GET",
@@ -692,9 +692,7 @@ const Content_ = () => {
         }
       })
       .catch((err) => {
-        console.log(err);
-        window.location = "/signin";
-        return false;
+        checkError(err)
       });
   };
 
@@ -709,10 +707,7 @@ const Content_ = () => {
       return false;
     }
     const token = localStorage.getItem("accessToken");
-    if (token == null || token == "") {
-      window.location = "/signin";
-      return false;
-    }
+    checkToken(token)
 
     axios({
       method: "GET",
@@ -813,10 +808,7 @@ const Content_ = () => {
     setLoading(true);
     setScanPopUp(false);
     const token = localStorage.getItem("accessToken");
-    if (token == null || token == "") {
-      window.location = "/signin";
-      return false;
-    }
+    checkToken(token)
 
     if (targetsID.length == 0) {
       notification.open({
@@ -872,10 +864,7 @@ const Content_ = () => {
     setLoading(true);
 
     const token = localStorage.getItem("accessToken");
-    if (token == null || token == "") {
-      window.location = "/signin";
-      return false;
-    }
+    checkToken(token)
     if (selectedRowKeys.length == 0) {
       notification.open({
         message: "Thông báo lỗi",
@@ -932,8 +921,8 @@ const Content_ = () => {
         <div style={{ marginBottom: "20px" }}>
           <h1>Danh sách Domain</h1>
           <Row>
-          <Col span={3.5} style={{display: "flex"}}>
-              <Space style={{float: "right" }}>
+            <Col span={3.5} style={{ display: "flex" }}>
+              <Space style={{ float: "right" }}>
                 <Button
                   size="medium"
                   icon={<FileAddOutlined />}
@@ -946,7 +935,7 @@ const Content_ = () => {
                   title="Thêm mới domain"
                   onOk={handleAddDomain}
                   onCancel={handleCancel}
-                  loading={true}
+                  loading={loading}
                   footer={[
                     <Button key="back" onClick={handleCancel}>
                       Hủy
@@ -1003,8 +992,8 @@ const Content_ = () => {
                 </Button>
               </Space>
             </Col>
-            <Col span={6} style={{display: "flex"}}>
-              <Space  style={{float: "right" }}>
+            <Col span={6} style={{ display: "flex" }}>
+              <Space style={{ float: "right" }}>
                 <Search
                   placeholder="input search text"
                   enterButton="Search"

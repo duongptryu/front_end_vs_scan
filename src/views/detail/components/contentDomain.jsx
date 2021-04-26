@@ -4,9 +4,7 @@ import "../../dashboard/index.css";
 import { TableOutlined } from "@ant-design/icons";
 import TableVulns from "./tableVulns";
 import Detail from "./detail";
-import { useState, useContext, useEffect } from "react";
-import detailDomainContext from "../../../contexts/detailDomain/detailDomainContext";
-import config from "../../../config";
+import { useState } from "react";
 import TableHistory from "./tableHistory";
 const axios = require("axios").default;
 

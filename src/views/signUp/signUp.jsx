@@ -9,7 +9,7 @@ const data = {
 const SignUp = () => {
   return (
     <div>
-      <Navigation></Navigation>
+      <Navigation style={{zIndex:0}}></Navigation>
       <BodySignUp data={data}></BodySignUp>
     </div>
   );

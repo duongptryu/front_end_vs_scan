@@ -1,5 +1,8 @@
+import { useContext, Redirect } from "react";
 import { Navigation } from "../../components/navigation";
 import BodySignIn from "./components/body";
+import UserContext from "../../contexts/user/userContext";
+import Footer_ from "../dashboard/components/footer"
 
 const data = {
   title: "V SCANNER",
@@ -7,6 +10,11 @@ const data = {
 };
 
 const SignIn = () => {
+
+  const { user } = useContext(UserContext)
+  if (user){
+    return <Redirect to="/dashboard"/>
+  }
   return (
     <div>
       <Navigation></Navigation>

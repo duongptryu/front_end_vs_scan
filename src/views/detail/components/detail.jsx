@@ -1,39 +1,33 @@
 import { Space, Row, notification } from "antd";
-import { Pie } from "@ant-design/charts";
-import { useState, useContext, useEffect } from "react";
+import { Pie } from '@ant-design/charts';
+import React, { useState, useContext, useEffect } from "react";
 import detailDomainContext from "../../../contexts/detailDomain/detailDomainContext";
-// import config from "../../../config";
+import config from "../../../config";
+
 const axios = require("axios").default;
 
-const Detail = (props) => {
-  const { id } = useContext(detailDomainContext);
+const url = config.API_URL + config.API_VR;
 
-  const [data, setData] = useState([
-    {
-      country: "High",
-      value: 1,
-    },
-    {
-      country: "Medium",
-      value: 1,
-    },
-    {
-      country: "Low",
-      value: 1,
-    },
-    {
-      country: "Information",
-      value: 1,
-    },
-  ]);
+const Detail= () => {
+  const { id, time } = useContext(detailDomainContext);
+
+  const [data, setData] = useState([]);
+  const [data_, setData_] = useState([]);
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
   });
 
   useEffect(() => {
-    fetch({ pagination });
-  }, data);
+    fetch();
+  }, []);
+
+  const checkDictEmpty = (dict) => {
+    for (var x in dict) {
+      return false;
+    }
+    return true;
+  };
 
   const fetch = (params = {}) => {
     const token = localStorage.getItem("accessToken");
@@ -42,9 +36,14 @@ const Detail = (props) => {
       return false;
     }
 
+    let query = url + `tasks/host/vulns?targetId=${id}`
+    if (time != undefined) {
+      query = query + `&historyIndexTime=${time}`
+    }
+
     axios({
       method: "GET",
-      url: config.API_URL + config.API_VR + `tasks/host/vulns?targetId=${id}`,
+      url: query,
       mode: "cors",
       headers: {
         "Content-Type": "application/json",
@@ -52,24 +51,52 @@ const Detail = (props) => {
       },
     })
       .then((res) => {
-        console.log(res);
-        // setData(res.data.hostVulns.overview);
-        // setPagination({
-        //   ...params.pagination,
-        //   total: res.data.hostVulns.vulns.length,
-        // });
+        if (checkDictEmpty(res.data.hostVulns)) {
+
+          setData([]);
+          notification.open({
+            message: "Thông báo",
+            description: "Không có dữ liệu",
+          });
+          return false;
+        }
+        const res_data = res.data.hostVulns.overview;
+        setData_(res_data);
+        setData([
+          {
+            country: "High",
+            value: res_data.high,
+          },
+          {
+            country: "Medium",
+            value: res_data.medium,
+          },
+          {
+            country: "Low",
+            value: res_data.low,
+          },
+          {
+            country: "Information",
+            value: res_data.info,
+          },
+        ]);
+        setPagination({
+          ...params.pagination,
+          total: res.data.hostVulns.vulns.length,
+        });
+        console.log(data);
       })
       .catch((err) => {
         console.log(err);
-        // setData([]);
-        // notification.open({
-        //   message: "Thông báo lỗi",
-        //   description: "Vui lòng thử lại sau",
-        // });
+        setData([]);
+        notification.open({
+          message: "Thông báo lỗi",
+          description: "Vui lòng thử lại sau",
+        });
       });
   };
 
-  const config = {
+  const config_pie = {
     color: ["#ff6666", "#ffd633", "#66ff33", "#3399ff"],
     data,
     meta: {
@@ -88,6 +115,8 @@ const Detail = (props) => {
     colorField: "country",
   };
 
+
+
   const convertDate = (second) => {
     var curdate = new Date(null);
     curdate.setTime(second * 1000);
@@ -104,7 +133,7 @@ const Detail = (props) => {
         <Space direction="vertical">
           <p>Địa chỉ: </p>
           <p>
-            <b>Trạng thái: </b>
+            <b>Trạng thái: </b> {data_.scanStatus}
           </p>
           <p>
             {" "}
@@ -123,18 +152,19 @@ const Detail = (props) => {
         <Space direction="vertical">
           <p>
             {" "}
-            <b>Trạng thái: </b>
+            <b>Trạng thái: </b> {data_.scanStatus}
           </p>
           <p>
-            <b>Bắt đầu: </b>
+            <b>Bắt đầu: </b> {convertDate(data_.startTime) || null}
           </p>
           <p>
             <b>Kết thúc: </b>
+            {convertDate(data_.endTime) || null}
           </p>
         </Space>
       </Row>
       <Row>
-        <Pie {...config} width={300} />
+        <Pie {...config_pie} width={400}/>
       </Row>
     </div>
   );

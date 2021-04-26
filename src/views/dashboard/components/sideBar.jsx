@@ -35,18 +35,18 @@ const SideBar = () => {
             <Image width={280} src={Logo} />
           </a>
         </div>
-        <Menu theme="dark" mode="inline" defaultSelectedKeys={["4"]}>
+        <Menu theme="dark" mode="inline">
           <Menu.Item key="1" icon={<DashboardOutlined />}>
             <Link to="/dashboard">Dashboard</Link>
           </Menu.Item>
           <Menu.Item key="2" icon={<TableOutlined />}>
-            <Link to="/weakness">Quản lý điểm yếu</Link>
+            <Link to="/weakness">Quản lý lỗ hổng</Link>
           </Menu.Item>
-          <Menu.Item key="2" icon={<TableOutlined />}>
+          <Menu.Item key="3" icon={<TableOutlined />}>
             <Link to="/domain">Quản lý domain</Link>
           </Menu.Item>
-          <Menu.Item key="2" icon={<TableOutlined />}>
-            <Link to="/detail">Detail</Link>
+          <Menu.Item key="4" icon={<TableOutlined />}>
+            <Link to="/user/me">Tài khoản</Link>
           </Menu.Item>
         </Menu>
       </Sider>

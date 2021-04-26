@@ -7,7 +7,7 @@ import detailDomainContext from "../../../contexts/detailDomain/detailDomainCont
 const axios = require("axios").default;
 
 const TableVulns = () => {
-  const { id } = useContext(detailDomainContext);
+  const { id, time } = useContext(detailDomainContext);
 
   const [data, setData] = useState([]);
   const [pagination, setPagination] = useState({
@@ -29,9 +29,14 @@ const TableVulns = () => {
       return false;
     }
 
+    let query = config.API_URL + config.API_VR + `tasks/host/vulns?targetId=${id}`
+    if (time != undefined) {
+      query = query + `&historyIndexTime=${time}`
+    }
+
     axios({
       method: "GET",
-      url: config.API_URL + config.API_VR + `tasks/host/vulns?targetId=${id}`,
+      url: query,
       mode: "cors",
       headers: {
         "Content-Type": "application/json",
@@ -50,8 +55,8 @@ const TableVulns = () => {
         setLoading(false);
         setData([]);
         notification.open({
-          message: "Thông báo lỗi",
-          description: "Vui lòng thử lại sau",
+          message: "Thông báo",
+          description: "Không có dữ liệu",
         });
       });
   };
@@ -118,7 +123,7 @@ const TableVulns = () => {
       width: "30%",
       sorter: true,
       render: (target) => {
-          return <Link to={"/detail-vuln/"+target.pluginId}>{target.pluginName}</Link>
+          return <Link to={"/detail-vuln/"+ target.pluginId + "/" + id}>{target.pluginName}</Link>
       } 
     },
     {

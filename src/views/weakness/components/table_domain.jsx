@@ -10,6 +10,7 @@ import {
   Row
 } from "antd";
 import moment from 'moment';
+import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "../../dashboard/index.css";
 import config from "../../../config";
@@ -71,7 +72,7 @@ const TableDomain = () => {
       },
     })
       .then((res) => {
-        console.log(res.data.overviews.hostOverviews);
+        console.log(res.data);
         setData(res.data.overviews.hostOverviews);
         setLoading(false);
         setPagination({
@@ -101,13 +102,11 @@ const TableDomain = () => {
     },
     {
       title: "Domain",
-      dataIndex: "target",
-      // filters: [
-      //   { text: "Male", value: "male" },
-      //   { text: "Female", value: "female" },
-      // ],
       sorter: true,
       width: "30%",
+      render: (target) => {
+        return <Link to={"/detail-domain/" + target.targetId}>{target.target}</Link>
+      }
     },
     {
       title: "Lỗ hổng",

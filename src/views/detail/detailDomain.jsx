@@ -8,7 +8,7 @@ import detailDomainContext from "../../contexts/detailDomain/detailDomainContext
 
 
 const DetailDomain = () => {
-  let { id } = useParams();
+  let { id, time } = useParams();
   const token = localStorage.getItem("accessToken");
   if (token == null || !token) {
     return <Redirect to="/signin" />;
@@ -20,7 +20,7 @@ const DetailDomain = () => {
         <SideBar></SideBar>
         <Layout style={{ marginLeft: "15%" }}>
           <Header_></Header_>
-          <detailDomainContext.Provider value={{id}}>
+          <detailDomainContext.Provider value={{id, time}}>
             <ContentDomain></ContentDomain>
           </detailDomainContext.Provider>
           <Footer_></Footer_>

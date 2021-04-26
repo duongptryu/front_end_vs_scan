@@ -10,6 +10,7 @@ import {
   DatePicker,
   notification,
 } from "antd";
+import { Link } from "react-router-dom"
 import moment from "moment";
 import config from "../../../config";
 const axios = require("axios").default;
@@ -67,8 +68,9 @@ const TableWkn = () => {
       .then((res) => {
         let data_res = [];
         for (var key in res.data.overviews.vulns) {
-          data_res.push(res.data.overviews.vulns[key]);
+          data_res.push({...res.data.overviews.vulns[key],"id":key});
         }
+        console.log(data_res)
         setData(data_res);
         setLoading(false);
         setPagination({
@@ -150,9 +152,11 @@ const TableWkn = () => {
     },
     {
       title: "Tên điểm yếu",
-      dataIndex: "pluginName",
       sorter: true,
       width: "40%",
+      render: (target) => {
+        return <Link to={"/detail-vuln/" + target.id}>{target.pluginName}</Link>
+      }
     },
     {
       title: "cwe",

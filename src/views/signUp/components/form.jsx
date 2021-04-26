@@ -6,7 +6,7 @@ import config from "../../../config";
 const axios = require("axios").default;
 
 const layout = {
-  labelCol: { span: 8 },
+  labelCol: { span: 12 },
   wrapperCol: { span: 16 },
 };
 const tailLayout = {
