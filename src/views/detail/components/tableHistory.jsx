@@ -25,6 +25,7 @@ const TableHistory = () => {
   };
 
   useEffect(() => {
+    document.title = "Chi tiết domain - Bảng lịch sử"
     fetch({ pagination });
   }, []);
 
@@ -83,12 +84,12 @@ const TableHistory = () => {
       width: "5%",
       render: (target) => {
         return <a href={"/detail-domain/" + id + "/" + target.startTime}>{x++}</a>
-
       },
+      align:"center"
     },
     {
       title: "Ngày bắt đầu",
-      sorter: true,
+      sorter: (a,b) => {return a.startTime - b.startTime},
       width: "20%",
       render: (target) => {
         return <a href={"/detail-domain/" + id + "/" + target.startTime}>{convertDate(target.startTime)}</a>
@@ -97,7 +98,7 @@ const TableHistory = () => {
     {
       title: "Ngày kết thúc",
       width: "20%",
-      sorter: true,
+      sorter: (a,b) => {return a.endTime - b.endTime},
       render: (target) => {
        return <a href={"/detail-domain/" + id + "/" + target.startTime}>{convertDate(target.endTime)}</a>
       },
@@ -105,10 +106,11 @@ const TableHistory = () => {
     {
       title: "Trạng thái",
       width: "10%",
-      sorter: true,
+      sorter: (a, b) => a.scanStatus.localeCompare(b.scanStatus),
       render : (target) => {
         return <a href={"/detail-domain/" + id + "/" + target.startTime}>{target.scanStatus}</a>
-      }
+      },
+      align:"center"
     }
   ];
 

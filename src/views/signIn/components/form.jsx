@@ -1,8 +1,7 @@
 import "./body.css";
 import { Form, Input, Button, notification } from "antd";
-import { useState, useContext } from "react";
+import { useState } from "react";
 import config from "../../../config";
-import UserContext from "../../../contexts/user/userContext";
 
 const axios = require("axios").default;
 
@@ -16,50 +15,6 @@ const tailLayout = {
 
 const FormSignIn = () => {
   const [loading, setLoading] = useState(false);
-
-  const { setUser } = useContext(UserContext);
-
-  const getCurrentUser = () => {
-    const token = localStorage.getItem("accessToken");
-    if (token == null || token == "") {
-      window.location = "/signin";
-      return false;
-    }
-
-    setLoading(true);
-    axios({
-      method: "GET",
-      url: config.API_URL + config.API_VR + "tasks/user/profile",
-      mode: "cors",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + token,
-      },
-    })
-      .then((res) => {
-        if (res.data.status_code == 0) {
-          notification.open({
-            message: "Thông báo lỗi",
-            description: res.data.msg,
-          });
-          setLoading(false);
-          return false;
-        } else {
-          setUser(res.data.user);
-          setLoading(false);
-          window.location = "/dashboard"
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        notification.open({
-          message: "Thông báo lỗi",
-          description: "Hệ thống đang lỗi, vui lòng thử lại sau",
-        });
-        setLoading(false);
-      });
-  };
 
   const handleSubmit = (e) => {
     setLoading(true);
@@ -88,7 +43,7 @@ const FormSignIn = () => {
             message: "Thông báo",
             description: "Xác thực thành công",
           });
-          getCurrentUser();
+          window.location = "/signin"
         }
       })
       .catch((err) => {

@@ -16,9 +16,12 @@ import VulsByDate from "./vulsByDate"
 
 
 const Content_ = () => {
+  let seconds = Math.floor(Date.now() / 1000);
+  console.log(seconds)
+
   const [time, setTime] = useState({
-    timeStart: "161755384",
-    timeEnd: "1618590699",
+    timeStart: seconds - 604800,
+    timeEnd: seconds,
   })
   return (
     <div style={{ marginRight: "10px", marginLeft: "20px" }}>
@@ -82,7 +85,7 @@ const Content_ = () => {
           <Row style={{ marginBottom: "20px" }}>
             <Col span={12}>
               <h3>
-                <strong>Theo điểm yếu</strong>
+                <strong>Theo lỗ hổng</strong>
               </h3>
             </Col>
             <Col span={12}>

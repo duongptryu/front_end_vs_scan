@@ -6,10 +6,11 @@ import Content_ from "./components/content"
 import  { Redirect } from 'react-router-dom'
 
 const DomainManage = () => {
-  // const token = localStorage.getItem("accessToken")
-  // if(token == null || !token){
-  //   return <Redirect to="/signin"/>
-  // }
+  const token = localStorage.getItem("accessToken")
+  if(token == null || !token){
+    return <Redirect to="/signin"/>
+  }
+
   return (
     <div>
       <Layout>

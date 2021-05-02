@@ -60,7 +60,7 @@ const ContentDomain = () => {
                     setTable("TableVuln");
                   }}
                 >
-                  Danh sách điểm yếu
+                  Danh sách lỗ hổng
                 </Button>
                 <Button
                   size="medium"

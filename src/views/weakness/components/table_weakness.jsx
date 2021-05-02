@@ -10,7 +10,7 @@ import {
   DatePicker,
   notification,
 } from "antd";
-import { Link } from "react-router-dom"
+import { Link } from "react-router-dom";
 import moment from "moment";
 import config from "../../../config";
 const axios = require("axios").default;
@@ -28,12 +28,15 @@ const TableWkn = () => {
   });
   const [loading, setLoading] = useState(false);
 
+  let seconds = Math.floor(Date.now() / 1000);
+
   const [time, setTime] = useState({
-    timeStart: "161755384",
-    timeEnd: "1618590699",
-  });
+    timeStart: seconds - 604800,
+    timeEnd: seconds,
+  })
 
   useEffect(() => {
+    document.title = "Quản lý lỗ hổng - Bảng domain"
     fetch({ time, pagination });
   }, []);
 
@@ -68,9 +71,9 @@ const TableWkn = () => {
       .then((res) => {
         let data_res = [];
         for (var key in res.data.overviews.vulns) {
-          data_res.push({...res.data.overviews.vulns[key],"id":key});
+          data_res.push({ ...res.data.overviews.vulns[key], id: key });
         }
-        console.log(data_res)
+        console.log(data_res);
         setData(data_res);
         setLoading(false);
         setPagination({
@@ -92,7 +95,29 @@ const TableWkn = () => {
     {
       title: "Mức độ",
       dataIndex: "risk",
-      sorter: true,
+      sorter: (a, b) => {
+        const orders = { Low: 1, Medium: 2, High: 3, Information: 4 };
+        return orders[a.risk] - orders[b.risk];
+      },
+      filters: [
+        {
+          text: "High",
+          value: "High",
+        },
+        {
+          text: "Medium",
+          value: "Medium",
+        },
+        {
+          text: "Low",
+          value: "Low",
+        },
+        {
+          text: "Information",
+          value: "Information",
+        },
+      ],
+      onFilter: (value, record) => record.risk.indexOf(value) === 0,
       width: "10%",
       render: (risk) => {
         if (risk == "High") {
@@ -100,7 +125,7 @@ const TableWkn = () => {
             <Button
               type="text"
               style={{
-                backgroundColor: "#ff6666",
+                backgroundColor: config.HIGH,
                 color: "white",
                 width: "80%",
               }}
@@ -113,7 +138,7 @@ const TableWkn = () => {
             <Button
               type="text"
               style={{
-                backgroundColor: "#ffd633",
+                backgroundColor: config.MEDIUM,
                 color: "white",
                 width: "80%",
               }}
@@ -126,7 +151,7 @@ const TableWkn = () => {
             <Button
               type="text"
               style={{
-                backgroundColor: "#66ff33",
+                backgroundColor: config.LOW,
                 color: "white",
                 width: "80%",
               }}
@@ -139,7 +164,7 @@ const TableWkn = () => {
             <Button
               type="text"
               style={{
-                backgroundColor: "#3399ff",
+                backgroundColor: config.INFO,
                 color: "white",
                 width: "80%",
               }}
@@ -151,30 +176,31 @@ const TableWkn = () => {
       },
     },
     {
-      title: "Tên điểm yếu",
-      sorter: true,
+      title: "Tên lỗ hổng",
       width: "40%",
       render: (target) => {
-        return <Link to={"/detail-vuln/" + target.id}>{target.pluginName}</Link>
-      }
+        return (
+          <Link to={"/detail-vuln/" + target.id}>{target.pluginName}</Link>
+        );
+      },
     },
     {
       title: "cwe",
       dataIndex: "cwe",
+      sorter: (a,b) => {return a.cwe - b.cwe},
       width: "10%",
-      sorter: true,
     },
     {
       title: "Số domain bị ảnh hưởng",
       dataIndex: "countDomain",
+      sorter: (a,b) => {return a.countDomain - b.countDomain},
       width: "20%",
-      sorter: true,
     },
     {
       title: "Tổng số endpoint bị ảnh hưởng",
       dataIndex: "count",
+      sorter: (a,b) => {return a.count - b.count},
       width: "40%",
-      sorter: true,
     },
   ];
 

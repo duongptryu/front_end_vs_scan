@@ -3,6 +3,7 @@ import { Table, notification, Button } from "antd";
 import { useEffect, useState } from "react";
 import "../../dashboard/index.css";
 import config from "../../../config";
+import {Link} from "react-router-dom"
 const axios = require("axios").default;
 
 const TableWkn = (props) => {
@@ -45,7 +46,7 @@ const TableWkn = (props) => {
       .then((res) => {
         let data_res = [];
         for (var key in res.data.overviews.vulns) {
-          data_res.push(res.data.overviews.vulns[key]);
+          data_res.push({...res.data.overviews.vulns[key],"id":key});
         }
         setData(data_res);
         setLoading(false);
@@ -71,6 +72,7 @@ const TableWkn = (props) => {
       title: "STT",
       key: "index",
       width: "5%",
+      align:"center",
       render: () => {
         return x++;
       },
@@ -78,14 +80,36 @@ const TableWkn = (props) => {
     {
       title: "Mức độ",
       dataIndex: "risk",
-      sorter: true,
+      sorter: (a, b) => { 
+        const orders = { 'Low': 1, 'Medium': 2, 'High': 3, "Information": 4};
+        return orders[a.risk] - orders[b.risk];
+      },
+      filters: [
+        {
+          text: 'High',
+          value: 'High',
+        },
+        {
+          text: 'Medium',
+          value: 'Medium',
+        },
+        {
+          text: 'Low',
+          value: 'Low',
+        },
+        {
+          text: 'Information',
+          value: 'Information',
+        },
+      ],
+      onFilter: (value, record) => record.risk.indexOf(value) === 0,
       width: "10%",
       render: (risk) => {
         if (risk == "High") {
           return (
             <Button
               type="text"
-              style={{ backgroundColor: "#ff6666", color: "white", width:"90%" }}
+              style={{ backgroundColor: config.HIGH, color: "white", width:"90%" }}
             >
               {risk}
             </Button>
@@ -94,7 +118,7 @@ const TableWkn = (props) => {
           return (
             <Button
               type="text"
-              style={{ backgroundColor: "#ffd633", color: "white", width:"90%"  }}
+              style={{ backgroundColor: config.MEDIUM, color: "white", width:"90%"  }}
             >
               {risk}
             </Button>
@@ -103,7 +127,7 @@ const TableWkn = (props) => {
           return (
             <Button
               type="text"
-              style={{ backgroundColor: "#66ff33", color: "white", width:"90%"  }}
+              style={{ backgroundColor: config.LOW, color: "white", width:"90%"  }}
             >
               {risk}
             </Button>
@@ -112,7 +136,7 @@ const TableWkn = (props) => {
           return (
             <Button
               type="text"
-              style={{ backgroundColor: "#3399ff", color: "white", width:"90%"  }}
+              style={{ backgroundColor: config.INFO, color: "white", width:"90%"  }}
             >
               {risk}
             </Button>
@@ -121,22 +145,25 @@ const TableWkn = (props) => {
       },
     },
     {
-      title: "Tên điểm yếu",
-      dataIndex: "pluginName",
-      sorter: true,
+      title: "Tên lỗ hổng",
       width: "40%",
+      render: (target) => {
+        return <Link to={"/detail-vuln/" + target.id}>{target.pluginName}</Link>
+      }
     },
     {
       title: "cwe",
       dataIndex: "cwe",
       width: "10%",
-      sorter: true,
+      sorter: (a,b) => a.cwe - b.cwe,
+      align:"center"
     },
     {
       title: "Số domain bị ảnh hưởng",
       dataIndex: "countDomain",
       width: "15%",
-      sorter: true,
+      sorter: (a,b) => a.cwe - b.cwe,
+      align:"center"
     },
   ];
 

@@ -1,9 +1,9 @@
 // import "antd/dist/antd.css";
-import { Table, Space, Button, notification } from "antd";
+import { Table, Button, notification } from "antd";
 import { useEffect, useState, useContext } from "react";
-import { Link } from "react-router-dom"
+import { Link } from "react-router-dom";
 import config from "../../../config";
-import detailDomainContext from "../../../contexts/detailDomain/detailDomainContext"
+import detailDomainContext from "../../../contexts/detailDomain/detailDomainContext";
 const axios = require("axios").default;
 
 const TableVulns = () => {
@@ -18,6 +18,7 @@ const TableVulns = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    document.title = "Chi tiết domain - Bảng lỗ hổng"
     fetch({ pagination });
   }, []);
 
@@ -29,9 +30,10 @@ const TableVulns = () => {
       return false;
     }
 
-    let query = config.API_URL + config.API_VR + `tasks/host/vulns?targetId=${id}`
+    let query =
+      config.API_URL + config.API_VR + `tasks/host/vulns?targetId=${id}`;
     if (time != undefined) {
-      query = query + `&historyIndexTime=${time}`
+      query = query + `&historyIndexTime=${time}`;
     }
 
     axios({
@@ -48,7 +50,7 @@ const TableVulns = () => {
         setLoading(false);
         setPagination({
           ...params.pagination,
-          total:res.data.hostVulns.vulns.length,
+          total: res.data.hostVulns.vulns.length,
         });
       })
       .catch((err) => {
@@ -71,72 +73,116 @@ const TableVulns = () => {
       render: () => {
         return x++;
       },
+      align: "center",
     },
     {
       title: "Mức độ",
       dataIndex: "risk",
-      sorter: true,
+      sorter: (a, b) => {
+        const orders = { Low: 1, Medium: 2, High: 3, Information: 4 };
+        return orders[a.risk] - orders[b.risk];
+      },
+      filters: [
+        {
+          text: "High",
+          value: "High",
+        },
+        {
+          text: "Medium",
+          value: "Medium",
+        },
+        {
+          text: "Low",
+          value: "Low",
+        },
+        {
+          text: "Information",
+          value: "Information",
+        },
+      ],
+      onFilter: (value, record) => record.risk.indexOf(value) === 0,
+
       width: "10%",
       render: (risk) => {
         if (risk == "High") {
-            return (
-              <Button
-                type="text"
-                style={{ backgroundColor: "#ff6666", color: "white", width:"80%"}}
-                
-              >
-                {risk}
-              </Button>
-            );
-          } else if (risk == "Medium") {
-            return (
-              <Button
-                type="text"
-                style={{ backgroundColor: "#ffd633", color: "white",  width:"80%"}}
-              >
-                {risk}
-              </Button>
-            );
-          } else if (risk == "Low") {
-            return (
-              <Button
-                type="text"
-                style={{ backgroundColor: "#66ff33", color: "white",  width:"80%" }}
-              >
-                {risk}
-              </Button>
-            );
-          } else {
-            return (
-              <Button
-                type="text"
-                style={{ backgroundColor: "#3399ff", color: "white",  width:"80%"}}
-              >
-                {risk}
-              </Button>
-            );
-          }
-      }
+          return (
+            <Button
+              type="text"
+              style={{
+                backgroundColor: config.HIGH,
+                color: "white",
+                width: "80%",
+              }}
+            >
+              {risk}
+            </Button>
+          );
+        } else if (risk == "Medium") {
+          return (
+            <Button
+              type="text"
+              style={{
+                backgroundColor: config.MEDIUM,
+                color: "white",
+                width: "80%",
+              }}
+            >
+              {risk}
+            </Button>
+          );
+        } else if (risk == "Low") {
+          return (
+            <Button
+              type="text"
+              style={{
+                backgroundColor: config.LOW,
+                color: "white",
+                width: "80%",
+              }}
+            >
+              {risk}
+            </Button>
+          );
+        } else {
+          return (
+            <Button
+              type="text"
+              style={{
+                backgroundColor: config.INFO,
+                color: "white",
+                width: "80%",
+              }}
+            >
+              {risk}
+            </Button>
+          );
+        }
+      },
     },
     {
-      title: "Tên điểm yếu",
+      title: "Tên lỗ hổng",
       width: "30%",
-      sorter: true,
       render: (target) => {
-          return <Link to={"/detail-vuln/"+ target.pluginId + "/" + id}>{target.pluginName}</Link>
-      } 
+        return (
+          <Link to={"/detail-vuln/" + target.pluginId + "/" + id}>
+            {target.pluginName}
+          </Link>
+        );
+      },
     },
     {
       title: "CWE",
       dataIndex: "cwe",
       width: "10%",
-      sorter: true,
+      align: "center",
+      sorter: (a, b) => a.cwe - b.cwe,
     },
     {
       title: "Số endpoint ảnh hưởng",
       dataIndex: "count",
       width: "20%",
-      sorter: true,
+      align: "center",
+      sorter: (a, b) => a.count - b.count,
     },
   ];
 

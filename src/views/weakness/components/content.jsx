@@ -23,6 +23,7 @@ const { Search } = Input;
 const { RangePicker } = DatePicker;
 
 const Content_ = () => {
+
     const [table, setTable] = useState("TableDomain")
 
   return (
@@ -30,7 +31,7 @@ const Content_ = () => {
       <div style={{ marginTop: "20px" }}>
         <Row>
           <Col span={24}>
-            <TableOutlined /> Quản lý điểm yếu /{" "}
+            <TableOutlined /> Quản lý lỗ hổng /{" "}
           </Col>
         </Row>
       </div>

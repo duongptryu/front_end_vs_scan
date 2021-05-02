@@ -3,6 +3,7 @@ import { Table, Space, Button, notification } from "antd";
 import "../index.css";
 import { useEffect, useState } from "react";
 import config from "../../../config";
+import {Link} from "react-router-dom"
 const axios = require("axios").default;
 
 
@@ -82,41 +83,45 @@ const TableDomain = (props) => {
       render: () => {
         return x++
       },
+      align:"center"
     },
     {
       title: "Domain",
-      dataIndex: "target",
-      sorter: true,
       width: "30%",
+      render: (target) => {
+        return <Link to={"/detail-domain/" + target.targetId}>{target.target}</Link>
+      }
     },
     {
       title: "Lỗ hổng",
       width: "30%",
-      sorter: true,
+      sorter: (a, b) => { 
+        return a.overview.high - b.overview.high
+      },
       render: (target) => {
         return (
           <Space>
             <Button
               type="text"
-              style={{ backgroundColor: "#ff6666", color: "white"}}
+              style={{ backgroundColor: config.HIGH, color: "white"}}
             >
               {target.overview.high}
             </Button>
             <Button
               type="text"
-              style={{ backgroundColor: "#ffd633", color: "white" }}
+              style={{ backgroundColor: config.MEDIUM, color: "white" }}
             >
               {target.overview.medium}
             </Button>
             <Button
               type="text"
-              style={{ backgroundColor: "#66ff33", color: "white" }}
+              style={{ backgroundColor: config.LOW, color: "white" }}
             >
               {target.overview.low}
             </Button>
             <Button
               type="text"
-              style={{ backgroundColor: "#3399ff", color: "white" }}
+              style={{ backgroundColor: config.INFO, color: "white" }}
             >
               {target.overview.info}
             </Button>
@@ -128,6 +133,7 @@ const TableDomain = (props) => {
       title: "Trạng thái",
       width: "20%",
       sorter: true,
+      align:"center",
       render: (target) => {
         return <p>{target.overview.scanStatus}</p>;
       },

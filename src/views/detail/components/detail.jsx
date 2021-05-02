@@ -12,7 +12,7 @@ const Detail= () => {
   const { id, time } = useContext(detailDomainContext);
 
   const [data, setData] = useState([]);
-  const [data_, setData_] = useState([]);
+  const [data_, setData_] = useState({});
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
@@ -61,7 +61,7 @@ const Detail= () => {
           return false;
         }
         const res_data = res.data.hostVulns.overview;
-        setData_(res_data);
+        setData_({...res.data.hostVulns.targetInfo,startTime: res_data.startTime, endTime: res_data.endTime});
         setData([
           {
             country: "High",
@@ -84,10 +84,8 @@ const Detail= () => {
           ...params.pagination,
           total: res.data.hostVulns.vulns.length,
         });
-        console.log(data);
       })
       .catch((err) => {
-        console.log(err);
         setData([]);
         notification.open({
           message: "Thông báo lỗi",
@@ -97,7 +95,7 @@ const Detail= () => {
   };
 
   const config_pie = {
-    color: ["#ff6666", "#ffd633", "#66ff33", "#3399ff"],
+    color: [config.HIGH, config.MEDIUM, config.LOW, config.INFO],
     data,
     meta: {
       country: {
@@ -131,16 +129,19 @@ const Detail= () => {
       </Row>
       <Row>
         <Space direction="vertical">
-          <p>Địa chỉ: </p>
+          <p><b>Địa chỉ:</b> {data_.target}</p>
           <p>
             <b>Trạng thái: </b> {data_.scanStatus}
           </p>
           <p>
             {" "}
-            <b>Xác thực:</b>
+            <b>Xác thực: </b>
+            {data_.verify == false && "Chưa xác thực"}
+            {data_.verify == true && "Đã xác thực"}
           </p>
           <p>
             <b>Ngày thêm:</b>{" "}
+            {data_.createTime}
           </p>
         </Space>
       </Row>

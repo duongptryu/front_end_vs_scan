@@ -30,7 +30,7 @@ import {
         <div style={{ marginTop: "20px" }}>
           <Row>
             <Col span={24}>
-              <TableOutlined /> Quản lý điểm yếu /{" "}
+              <TableOutlined /> Quản lý lỗ hổng /{" "}
             </Col>
           </Row>
         </div>

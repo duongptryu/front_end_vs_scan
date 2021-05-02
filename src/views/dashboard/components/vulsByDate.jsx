@@ -93,7 +93,7 @@ const VulsByDate = (props) => {
             icon={<WarningOutlined />}
             color="blue"
             title="Cao"
-            backgroundColor="#ff4d4d"
+            backgroundColor={config.HIGH}
             number={overview.high}
             loading={loading}
           ></NumberCard>
@@ -103,7 +103,7 @@ const VulsByDate = (props) => {
             icon={<ExclamationCircleOutlined />}
             color="blue"
             title="Trung bình"
-            backgroundColor="#ffd633"
+            backgroundColor={config.MEDIUM}
             number={overview.high}
             loading={loading}
           ></NumberCard>
@@ -113,7 +113,7 @@ const VulsByDate = (props) => {
             icon={<MinusCircleOutlined />}
             color="blue"
             title="Thấp"
-            backgroundColor="#85e085"
+            backgroundColor={config.LOW}
             number={overview.high}
             loading={loading}
           ></NumberCard>
@@ -123,7 +123,7 @@ const VulsByDate = (props) => {
             icon={<QuestionCircleOutlined />}
             color="blue"
             title="Thông tin"
-            backgroundColor="#809fff"
+            backgroundColor={config.INFO}
             number={overview.high}
             loading={loading}
           ></NumberCard>

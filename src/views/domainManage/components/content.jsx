@@ -24,6 +24,10 @@ import {
   EditOutlined,
   DeleteOutlined,
   SecurityScanOutlined,
+  StopOutlined,
+  PauseCircleOutlined,
+  CaretRightOutlined,
+  UnorderedListOutlined
 } from "@ant-design/icons";
 import config from "../../../config";
 const axios = require("axios").default;
@@ -42,17 +46,6 @@ const formItemLayout = {
   },
 };
 
-const menuAction = (
-  <Menu>
-    <Menu.Item key="1" icon={<SecurityScanOutlined />}>
-      Scan
-    </Menu.Item>
-    <Menu.Item key="2" icon={<DeleteOutlined />}>
-      Xóa
-    </Menu.Item>
-  </Menu>
-);
-
 const getRandomuserParams = (params) => ({
   results: params.pagination.pageSize,
   page: params.pagination.current,
@@ -69,9 +62,9 @@ const Content_ = () => {
   const [visibleCreate, setVisibleCreate] = useState(false);
   const [visibleConfirm, setVisibleConfirm] = useState(false);
   const [idVerify, setIdVerify] = useState();
-  const [selectedRow, setSelectedRow] = useState(true);
 
   useEffect(() => {
+    document.title = "Chi tiết domain - Quản lý domain";
     fetch({ pagination });
   }, []);
 
@@ -82,7 +75,7 @@ const Content_ = () => {
   const handleChangeSchedule = (target, p) => {
     console.log(target.targetId);
     const token = localStorage.getItem("accessToken");
-    checkToken(token)
+    checkToken(token);
     setLoading(true);
     let data = {};
     if (p == 1) {
@@ -236,13 +229,92 @@ const Content_ = () => {
     }
   };
 
+  const menuAction = (target) => {
+    if (target.scanStatus == "processing" || target.scanStatus == "running") {
+      return (
+        <Menu theme="light">
+          <Menu.Item key="1">
+            <Button
+              type="default"
+              onClick={() => {
+                startScan(target);
+              }}
+              style={{ backgroundColor: "blueviolet", color: "white", width:"100%" }}
+            >
+              <PauseCircleOutlined /> Pause
+            </Button>
+          </Menu.Item>
+          <Menu.Item key="2">
+            <Button
+              type="default"
+              onClick={() => {
+                startScan(target);
+              }}
+              style={{ backgroundColor: "red", color: "white", width:"100%" }}
+            >
+              <StopOutlined /> Stop
+            </Button>
+          </Menu.Item>
+        </Menu>
+      );
+    } else if (
+      target.scanStatus == "pending" ||
+      target.scanStatus == "completed" ||
+      target.scanStatus == "cancel"
+    ) {
+      return (
+        <Menu theme="light">
+          <Menu.Item key="1">
+            <Button
+              type="primary"
+              onClick={() => {
+                startScan(target);
+              }}
+            >
+              <SecurityScanOutlined /> Scan
+            </Button>
+          </Menu.Item>
+        </Menu>
+      );
+    } else {
+      return (
+        <div>
+          <Menu theme="light">
+            <Menu.Item key="1">
+              <Button
+                type="default"
+                onClick={() => {
+                  startScan(target);
+                }}
+                style={{ backgroundColor: "red", color: "white", width:"100%" }}
+              >
+                <StopOutlined /> Stop
+              </Button>
+            </Menu.Item>
+            <Menu.Item key="1">
+              <Button
+                type="primary"
+                onClick={() => {
+                  startScan(target);
+                }}
+                style={{width:"80%"}}
+              >
+                <CaretRightOutlined /> Resume
+              </Button>
+            </Menu.Item>
+          </Menu>
+        </div>
+      );
+    }
+  };
+
   const handleAddDomain = (e) => {
     setLoading(true);
     const data = document.querySelector("#domains").innerHTML;
     const arr = data.split(",");
 
     const token = localStorage.getItem("accessToken");
-    checkToken(token)
+    checkToken(token);
 
     axios({
       method: "POST",
@@ -298,7 +370,7 @@ const Content_ = () => {
   const handleSwitch = (target) => {
     console.log(target.targetId);
     const token = localStorage.getItem("accessToken");
-    checkToken(token)
+    checkToken(token);
     setLoading(true);
     let data = {};
     if (target.isScan) {
@@ -351,17 +423,27 @@ const Content_ = () => {
       });
   };
 
+  const convertTimeToSeconds = (dateTime) => {
+    let arrDateTime = dateTime.split(" ");
+    var d = new Date(arrDateTime[0].replace(":", "-") + " " + arrDateTime[1]);
+    return d.getSeconds();
+  };
+
   const columns = [
     {
       title: "Thời gian cập nhật",
       dataIndex: "updateTime",
-      sorter: true,
+      sorter: (a, b) => {
+        return (
+          convertTimeToSeconds(a.updateTime) -
+          convertTimeToSeconds(b.updateTime)
+        );
+      },
       width: "20%",
     },
     {
       title: "Domain",
-      sorter: true,
-      width: "30%",
+      width: "15%",
       render: (target) => {
         return (
           <Link to={"/detail-domain/" + target.targetId}>{target.target}</Link>
@@ -370,9 +452,10 @@ const Content_ = () => {
     },
     {
       title: "Lập lịch",
-      width: "20%",
+      width: "15%",
       key: "scanSchedule",
-      sorter: true,
+      align: "center",
+      sorter: (a, b) => a.isScan - b.isScan,
       render: (target) => {
         return (
           <Space>
@@ -404,7 +487,10 @@ const Content_ = () => {
     {
       title: "Xác thực",
       width: "10%",
-      sorter: true,
+      align: "center",
+      sorter: (a, b) => {
+        return a.isVerify - b.isVerify;
+      },
       render: (target) => {
         return (
           <>
@@ -442,31 +528,30 @@ const Content_ = () => {
         );
       },
     },
-    {},
-    {},
+    {
+      title: "Trạng thái",
+      dataIndex: "scanStatus",
+      width: "15%",
+      align: "center",
+      sorter: (a, b) => {
+        return a.scanStatus.localeCompare(b.scanStatus);
+      },
+    },
     {
       title: "Tùy chọn",
-      width: "15%",
+      width: "20%",
+      align: "center",
+      sorter: (a, b) => {
+        return a.scanStatus.localeCompare(b.scanStatus);
+      },
       render: (target) => {
         return (
           <Space>
-            {(target.scanStatus == "processing" ||
-              target.scanStatus == "running") && (
-              <Button type="primary" disabled>
-                <SecurityScanOutlined /> Scan
+            <Dropdown overlay={menuAction(target)}>
+              <Button type="text" disabled>
+              <UnorderedListOutlined />
               </Button>
-            )}
-            {(target.scanStatus == "pending" ||
-              target.scanStatus == "completed") && (
-              <Button
-                type="primary"
-                onClick={() => {
-                  startScan(target);
-                }}
-              >
-                <SecurityScanOutlined /> Scan
-              </Button>
-            )}
+            </Dropdown>
             <Button
               type="text"
               onClick={() => {
@@ -490,7 +575,7 @@ const Content_ = () => {
     setLoading(true);
 
     const token = localStorage.getItem("accessToken");
-    checkToken(token)
+    checkToken(token);
 
     axios({
       method: "POST",
@@ -535,7 +620,7 @@ const Content_ = () => {
     setLoading(true);
 
     const token = localStorage.getItem("accessToken");
-    checkToken(token)
+    checkToken(token);
 
     axios({
       method: "POST",
@@ -592,7 +677,7 @@ const Content_ = () => {
     setLoading(true);
 
     const token = localStorage.getItem("accessToken");
-    checkToken(token)
+    checkToken(token);
 
     axios({
       method: "GET",
@@ -604,6 +689,7 @@ const Content_ = () => {
       },
     })
       .then((res) => {
+        console.log(res);
         if (res.data.status_code == 0) {
           setLoading(false);
           notification.open({
@@ -625,7 +711,7 @@ const Content_ = () => {
         }
       })
       .catch((err) => {
-        checkError(err)
+        checkError(err);
       });
   };
 
@@ -661,7 +747,7 @@ const Content_ = () => {
       return false;
     }
     const token = localStorage.getItem("accessToken");
-    checkToken(token)
+    checkToken(token);
 
     axios({
       method: "GET",
@@ -692,7 +778,7 @@ const Content_ = () => {
         }
       })
       .catch((err) => {
-        checkError(err)
+        checkError(err);
       });
   };
 
@@ -707,7 +793,7 @@ const Content_ = () => {
       return false;
     }
     const token = localStorage.getItem("accessToken");
-    checkToken(token)
+    checkToken(token);
 
     axios({
       method: "GET",
@@ -808,7 +894,7 @@ const Content_ = () => {
     setLoading(true);
     setScanPopUp(false);
     const token = localStorage.getItem("accessToken");
-    checkToken(token)
+    checkToken(token);
 
     if (targetsID.length == 0) {
       notification.open({
@@ -864,7 +950,7 @@ const Content_ = () => {
     setLoading(true);
 
     const token = localStorage.getItem("accessToken");
-    checkToken(token)
+    checkToken(token);
     if (selectedRowKeys.length == 0) {
       notification.open({
         message: "Thông báo lỗi",
