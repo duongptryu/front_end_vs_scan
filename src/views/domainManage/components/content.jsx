@@ -235,22 +235,22 @@ const Content_ = () => {
         <Menu theme="light">
           <Menu.Item key="1">
             <Button
-              type="default"
+              type="primary"
               onClick={() => {
-                startScan(target);
+                handlePaused(target);
               }}
-              style={{ backgroundColor: "blueviolet", color: "white", width:"100%" }}
+              style={{ width:"100%" }}
             >
               <PauseCircleOutlined /> Pause
             </Button>
           </Menu.Item>
           <Menu.Item key="2">
             <Button
-              type="default"
+              type="primary"
               onClick={() => {
-                startScan(target);
+                handleStop(target);
               }}
-              style={{ backgroundColor: "red", color: "white", width:"100%" }}
+              style={{ width:"100%" }}
             >
               <StopOutlined /> Stop
             </Button>
@@ -282,11 +282,11 @@ const Content_ = () => {
           <Menu theme="light">
             <Menu.Item key="1">
               <Button
-                type="default"
+                type="primary"
                 onClick={() => {
-                  startScan(target);
+                  handleStop(target);
                 }}
-                style={{ backgroundColor: "red", color: "white", width:"100%" }}
+                style={{width:"100%" }}
               >
                 <StopOutlined /> Stop
               </Button>
@@ -295,7 +295,7 @@ const Content_ = () => {
               <Button
                 type="primary"
                 onClick={() => {
-                  startScan(target);
+                  handleResume(target);
                 }}
                 style={{width:"80%"}}
               >
@@ -427,6 +427,146 @@ const Content_ = () => {
     let arrDateTime = dateTime.split(" ");
     var d = new Date(arrDateTime[0].replace(":", "-") + " " + arrDateTime[1]);
     return d.getSeconds();
+  };
+
+  
+  const handlePaused = (target) => {
+    const token = localStorage.getItem("accessToken");
+    checkToken(token);
+    setLoading(true);
+    let data = {targetIds: [target.targetId]};
+
+    axios({
+      method: "POST",
+      url: config.API_URL + config.API_VR + "tasks/scan/pause",
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+      data: data,
+    })
+      .then((res) => {
+        console.log(res);
+        if (res.data.status_code == 0) {
+          notification.open({
+            message: "Thông báo lỗi",
+            description: "Không thể thực hiện yêu cầu, vui lòng thử lại sau"
+          });
+          setLoading(false);
+          return false;
+        } else {
+          notification.open({
+            message: "Thông báo",
+            description: "Thành công",
+          });
+          setLoading(false);
+          setVisibleCreate(false);
+          fetch({ pagination });
+        }
+      })
+      .catch((err) => {
+        notification.open({
+          message: "Thông báo lỗi",
+          description: "Vui lòng thử lại sau",
+        });
+        setVisibleCreate(false);
+        setLoading(false);
+        return false;
+      });
+  };
+
+
+  const handleStop = (target) => {
+    const token = localStorage.getItem("accessToken");
+    checkToken(token);
+    setLoading(true);
+    let data = {targetIds: [target.targetId]};
+
+    axios({
+      method: "POST",
+      url: config.API_URL + config.API_VR + "tasks/scan/stop",
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+      data: data,
+    })
+      .then((res) => {
+        console.log(res);
+        if (res.data.status_code == 0) {
+          notification.open({
+            message: "Thông báo lỗi",
+            description: "Không thể thực hiện yêu cầu, vui lòng thử lại sau"
+          });
+          setLoading(false);
+          return false;
+        } else {
+          notification.open({
+            message: "Thông báo",
+            description: "Thành công",
+          });
+          setLoading(false);
+          setVisibleCreate(false);
+          fetch({ pagination });
+        }
+      })
+      .catch((err) => {
+        notification.open({
+          message: "Thông báo lỗi",
+          description: "Vui lòng thử lại sau",
+        });
+        setVisibleCreate(false);
+        setLoading(false);
+        return false;
+      });
+  };
+
+  const handleResume = (target) => {
+    const token = localStorage.getItem("accessToken");
+    checkToken(token);
+    setLoading(true);
+    let data = {targetIds: [target.targetId]};
+
+    axios({
+      method: "POST",
+      url: config.API_URL + config.API_VR + "tasks/scan/resume",
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+      data: data,
+    })
+      .then((res) => {
+        console.log(res);
+        if (res.data.status_code == 0) {
+          notification.open({
+            message: "Thông báo lỗi",
+            description: "Không thể thực hiện yêu cầu, vui lòng thử lại sau"
+          });
+          setLoading(false);
+          return false;
+        } else {
+          notification.open({
+            message: "Thông báo",
+            description: "Thành công",
+          });
+          setLoading(false);
+          setVisibleCreate(false);
+          fetch({ pagination });
+        }
+      })
+      .catch((err) => {
+        notification.open({
+          message: "Thông báo lỗi",
+          description: "Vui lòng thử lại sau",
+        });
+        setVisibleCreate(false);
+        setLoading(false);
+        return false;
+      });
   };
 
   const columns = [

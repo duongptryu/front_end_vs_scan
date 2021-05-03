@@ -44,10 +44,25 @@ const TableWkn = (props) => {
       },
     })
       .then((res) => {
+        console.log(res)
         let data_res = [];
+        let data_high = []
+        let data_medium = []
+        let data_low = []
+        let data_info = []
         for (var key in res.data.overviews.vulns) {
-          data_res.push({...res.data.overviews.vulns[key],"id":key});
+          if(res.data.overviews.vulns[key].risk == "High"){
+            data_high.push({...res.data.overviews.vulns[key],"id":key})
+          }else if (res.data.overviews.vulns[key].risk == "Medium"){
+            data_medium.push({...res.data.overviews.vulns[key],"id":key})
+          }else if (res.data.overviews.vulns[key].risk == "Low"){
+            data_low.push({...res.data.overviews.vulns[key],"id":key})
+          }else {
+            data_info.push({...res.data.overviews.vulns[key],"id":key})
+          }
         }
+        data_res= [...data_high,...data_medium,...data_low,...data_info]
+        console.log(data_res)
         setData(data_res);
         setLoading(false);
         setPagination({

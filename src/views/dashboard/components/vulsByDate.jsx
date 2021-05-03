@@ -57,7 +57,6 @@ const VulsByDate = (props) => {
       },
     })
       .then((res) => {
-          console.log(res)
         setOverview(res.data.overviews.overview);
         setLoading(false);
       })

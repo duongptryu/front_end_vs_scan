@@ -46,7 +46,25 @@ const TableVulns = () => {
       },
     })
       .then((res) => {
-        setData(res.data.hostVulns.vulns);
+        let data_high = []
+        let data_medium = []
+        let data_low = []
+        let data_info = []
+        res.data.hostVulns.vulns.forEach((target) => {
+          if(target.risk == "High"){
+            data_high.push(target)
+          }else if (target.risk == "Medium"){
+            data_medium.push(target)
+          }else if (target.risk == "Low"){
+            data_low.push(target)
+          }else {
+            data_info.push(target)
+          }
+        })
+          
+        
+        let data_res= [...data_high,...data_medium,...data_low,...data_info]
+        setData(data_res);
         setLoading(false);
         setPagination({
           ...params.pagination,

@@ -1,6 +1,6 @@
 // import "antd/dist/antd.css";
 import { Row, Col, Divider } from "antd";
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   DashboardOutlined,
   FileSearchOutlined,
@@ -12,6 +12,8 @@ import TableWkn from "./tableWkn";
 import TableDomain from "./tableDomain";
 import { Link } from "react-router-dom"
 import VulsByDate from "./vulsByDate"
+import config from "../../../config"
+const axios = require("axios").default;
 
 
 
@@ -23,6 +25,49 @@ const Content_ = () => {
     timeStart: seconds - 604800,
     timeEnd: seconds,
   })
+
+  const [overview, setOverview] = useState({});
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    fetch(time);
+  }, []);
+
+
+
+  const fetch = (params = {}) => {
+    setLoading(true);
+    const token = localStorage.getItem("accessToken");
+    if (token == null || token == "") {
+      window.location = "/signin";
+      return false;
+    }
+
+    axios({
+      method: "GET",
+      url:
+        config.API_URL +
+        config.API_VR +
+        `tasks/vulns/overviews?timeStart=${params.timeStart}&timeEnd=${params.timeEnd}`,
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+    })
+      .then((res) => {
+          console.log(res)
+        setOverview(res.data.overviews.overview);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        // window.location = "/signin";
+        // return false;
+      });
+  };
+
+
   return (
     <div style={{ marginRight: "10px", marginLeft: "20px" }}>
       <div style={{ marginTop: "20px" }}>
@@ -40,6 +85,8 @@ const Content_ = () => {
             color="blue"
             title="Tổng số domain rà quét"
             backgroundColor="#b380ff"
+            loading={loading}
+            number={overview.severity}
             ></NumberCard>
         </Col>
         <Col span={6}>
@@ -48,6 +95,8 @@ const Content_ = () => {
             color="red"
             title="Tổng số lỗ hổng"
             backgroundColor="#0099ff"
+            loading={loading}
+            number={overview.numberTargets}
           ></NumberCard>
         </Col>
         <Col span={6}>
@@ -56,6 +105,8 @@ const Content_ = () => {
             color="red"
             title="Các IP chưa rà quét"
             backgroundColor="#66ff66"
+            loading={loading}
+            number={overview.notScantargets}
           ></NumberCard>
         </Col>
       </Row>
