@@ -1,52 +1,26 @@
-import { useEffect, useState } from "react";
-import "../../dashboard/index.css";
-import {
-  Table,
-  Button,
-  Space,
-  Col,
-  Row,
-  Input,
-  DatePicker,
-  notification,
-} from "antd";
+// import "antd/dist/antd.css";
+import { Table, Button, notification } from "antd";
+import { useEffect, useState, useContext } from "react";
 import { Link } from "react-router-dom";
-import moment from "moment";
 import config from "../../../config";
+import detailDomainContext from "../../../contexts/detailDomain/detailDomainContext";
 const axios = require("axios").default;
 
-const dateFormat = "YYYY/MM/DD";
+const TableVulns = () => {
+  const { id, time } = useContext(detailDomainContext);
 
-const { RangePicker } = DatePicker;
-const { Search } = Input;
-
-const TableWkn = () => {
   const [data, setData] = useState([]);
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
   });
+
   const [loading, setLoading] = useState(false);
 
-  let seconds = Math.floor(Date.now() / 1000);
-
-  const [time, setTime] = useState({
-    timeStart: seconds - 604800,
-    timeEnd: seconds,
-  })
-
   useEffect(() => {
-    document.title = "Quản lý lỗ hổng - Bảng domain"
-    fetch({ time, pagination });
+    document.title = "Chi tiết domain - Bảng lỗ hổng"
+    fetch({ pagination });
   }, []);
-
-  const convertDate = (second) => {
-    var curdate = new Date(null);
-    curdate.setTime(second * 1000);
-    let x = curdate.toLocaleString().split(",")[0];
-    const x_split = x.split("/");
-    return x_split[2] + "/" + x_split[0] + "/" + x_split[1];
-  };
 
   const fetch = (params = {}) => {
     setLoading(true);
@@ -56,12 +30,15 @@ const TableWkn = () => {
       return false;
     }
 
+    let query =
+      config.API_URL + config.API_VR + `tasks/host/vulns?targetId=${id}`;
+    if (time != undefined) {
+      query = query + `&historyIndexTime=${time}`;
+    }
+
     axios({
       method: "GET",
-      url:
-        config.API_URL +
-        config.API_VR +
-        `tasks/vulns/overviews?timeStart=${params.time.timeStart}&timeEnd=${params.time.timeEnd}`,
+      url: query,
       mode: "cors",
       headers: {
         "Content-Type": "application/json",
@@ -69,41 +46,53 @@ const TableWkn = () => {
       },
     })
       .then((res) => {
-        let data_res = [];
         let data_high = []
         let data_medium = []
         let data_low = []
         let data_info = []
-        for (var key in res.data.overviews.vulns) {
-          if(res.data.overviews.vulns[key].risk == "High"){
-            data_high.push({...res.data.overviews.vulns[key],"id":key})
-          }else if (res.data.overviews.vulns[key].risk == "Medium"){
-            data_medium.push({...res.data.overviews.vulns[key],"id":key})
-          }else if (res.data.overviews.vulns[key].risk == "Low"){
-            data_low.push({...res.data.overviews.vulns[key],"id":key})
+        res.data.hostVulns.vulns.forEach((target) => {
+          if(target.risk == "High"){
+            data_high.push(target)
+          }else if (target.risk == "Medium"){
+            data_medium.push(target)
+          }else if (target.risk == "Low"){
+            data_low.push(target)
           }else {
-            data_info.push({...res.data.overviews.vulns[key],"id":key})
+            data_info.push(target)
           }
-        }
-        data_res= [...data_high,...data_medium,...data_low,...data_info]
+        })
+          
+        
+        let data_res= [...data_high,...data_medium,...data_low,...data_info]
         setData(data_res);
         setLoading(false);
         setPagination({
           ...params.pagination,
-          total: data_res.length,
+          total: res.data.hostVulns.vulns.length,
         });
       })
       .catch((err) => {
         setLoading(false);
         setData([]);
         notification.open({
-          message: "Thông báo lỗi",
-          description: "Vui lòng thử lại sau",
+          message: "Thông báo",
+          description: "Không có dữ liệu",
         });
       });
   };
 
+  let x = 1;
+
   const columns = [
+    {
+      title: "STT",
+      key: "index",
+      width: "5%",
+      render: () => {
+        return x++;
+      },
+      align: "center",
+    },
     {
       title: "Mức độ",
       dataIndex: "risk",
@@ -130,6 +119,7 @@ const TableWkn = () => {
         },
       ],
       onFilter: (value, record) => record.risk.indexOf(value) === 0,
+
       width: "10%",
       render: (risk) => {
         if (risk == "High") {
@@ -189,36 +179,33 @@ const TableWkn = () => {
     },
     {
       title: "Tên lỗ hổng",
-      width: "40%",
+      width: "30%",
       render: (target) => {
         return (
-          <Link to={"/detail-vuln/" + target.id}>{target.pluginName}</Link>
+          <Link to={"/detail-vuln/" + target.pluginId + "/" + id}>
+            {target.pluginName}
+          </Link>
         );
       },
     },
     {
-      title: "cwe",
+      title: "CWE",
       dataIndex: "cwe",
-      sorter: (a,b) => {return a.cwe - b.cwe},
       width: "10%",
+      align: "center",
+      sorter: (a, b) => a.cwe - b.cwe,
     },
     {
-      title: "Số domain bị ảnh hưởng",
-      dataIndex: "countDomain",
-      sorter: (a,b) => {return a.countDomain - b.countDomain},
-      width: "20%",
-    },
-    {
-      title: "Tổng số endpoint bị ảnh hưởng",
+      title: "Số endpoint ảnh hưởng",
       dataIndex: "count",
-      sorter: (a,b) => {return a.count - b.count},
-      width: "40%",
+      width: "20%",
+      align: "center",
+      sorter: (a, b) => a.count - b.count,
     },
   ];
 
   const handleTableChange = (pagination, filters, sorter) => {
     fetch({
-      time,
       sortField: sorter.field,
       sortOrder: sorter.order,
       pagination,
@@ -227,40 +214,15 @@ const TableWkn = () => {
   };
 
   return (
-    <div>
-      <Row>
-        <Col span={12}>
-          <Space>
-            <Search
-              placeholder="Tìm kiếm"
-              enterButton="Search"
-              size="medium"
-              width="200px"
-            />
-          </Space>
-        </Col>
-        <Col span={4}>
-          <Space style={{ marginBottom: 16, float: "right" }} size={12}>
-            <RangePicker
-              defaultValue={[
-                moment(convertDate(time.timeStart), dateFormat),
-                moment(convertDate(time.timeEnd), dateFormat),
-              ]}
-              loading={loading}
-            />
-          </Space>
-        </Col>
-      </Row>
-      <Table
-        columns={columns}
-        dataSource={data}
-        pagination={pagination}
-        loading={loading}
-        onChange={handleTableChange}
-        size="small"
-      />
-    </div>
+    <Table
+      columns={columns}
+      dataSource={data}
+      pagination={pagination}
+      loading={loading}
+      onChange={handleTableChange}
+      size="small"
+    />
   );
 };
 
-export default TableWkn;
+export default TableVulns;

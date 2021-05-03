@@ -1,4 +1,5 @@
 import { Menu, Layout, Avatar, Popover, Badge, List } from "antd";
+import { useState, useEffect} from "react"
 import {Fragment} from "react"
 import {
   BellOutlined,
@@ -6,6 +7,10 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
 } from '@ant-design/icons'
+import config from "../../../config";
+
+const axios = require("axios").default;
+
 const { Header } = Layout;
 const { SubMenu } = Menu
 
@@ -13,6 +18,43 @@ const Header_ = () => {
   const leftSide = [
     <h1>VSCANNER</h1>
   ]
+
+  const [user, setUser] = useState({name:"unknow"})
+
+  useEffect(() => {
+    getUser()
+  },[])
+
+  const getUser = () => {
+    const token = localStorage.getItem("accessToken");
+    if (token == null || token == "") {
+      return false;
+    }
+    axios({
+      method: "GET",
+      url: config.API_URL + config.API_VR + "tasks/user/profile",
+      mode: "cors",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+    })
+      .then((res) => {
+        console.log(res)
+        setUser({name:res.data.fullName})
+      })
+      .catch((err) => {
+        window.location = "/signin"
+        return false;
+      });
+  };
+
+  const logOut = () => {
+    setUser({})
+    localStorage.removeItem("accessToken")
+    window.location = "/signin"
+  }
 
   const rightContent = [
     <Menu key="user" mode="horizontal">
@@ -23,12 +65,12 @@ const Header_ = () => {
             <span style={{marginRight: 4 }}>
               Hi,
             </span>
-            <span>Tuong</span>
+            <span onClick={() => {window.location = "/user/me"}}>{user.name}</span>
             <Avatar style={{ marginLeft: 8 }} src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_Kk79LFjTf_Ypx8aaJkRtJHQ_zU6_P1_L6w&usqp=CAU" />
           </Fragment>
         }
       >
-        <Menu.Item key="SignOut">
+        <Menu.Item key="SignOut" onClick={logOut}>
           Sign out
         </Menu.Item>
       </SubMenu>

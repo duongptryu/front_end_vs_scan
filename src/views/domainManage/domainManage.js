@@ -10,6 +10,7 @@ const DomainManage = () => {
   if(token == null || !token){
     return <Redirect to="/signin"/>
   }
+
   return (
     <div>
       <Layout>

@@ -7,9 +7,10 @@ import {
   Col,
   DatePicker,
   Input,
-  Row
+  Row,
 } from "antd";
-import moment from 'moment';
+import moment from "moment";
+import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "../../dashboard/index.css";
 import config from "../../../config";
@@ -27,13 +28,16 @@ const TableDomain = () => {
 
   const [loading, setLoading] = useState(false);
 
-  const [time, setTime] = useState({
-    timeStart: "161755384",
-    timeEnd: "1618590699",
-  });
+  let seconds = Math.floor(Date.now() / 1000);
 
+  const [time, setTime] = useState({
+    timeStart: seconds - 604800,
+    timeEnd: seconds,
+  })
+  
   useEffect(() => {
-    fetch({time, pagination});
+    document.title = "Quản lý lỗ hổng - Bảng domain"
+    fetch({ time, pagination });
   }, []);
 
   const convertDate = (second) => {
@@ -71,7 +75,7 @@ const TableDomain = () => {
       },
     })
       .then((res) => {
-        console.log(res.data.overviews.hostOverviews);
+        console.log(res.data);
         setData(res.data.overviews.hostOverviews);
         setLoading(false);
         setPagination({
@@ -92,7 +96,9 @@ const TableDomain = () => {
   const columns = [
     {
       title: "Lần quét cuối",
-      sorter: true,
+      sorter: (a, b) => {
+        return a.overview.startTime - b.overview.startTime;
+      },
       render: (target) => {
         console.log(target.overview.startTime);
         return convertDateWithTime(target.overview.startTime);
@@ -101,42 +107,44 @@ const TableDomain = () => {
     },
     {
       title: "Domain",
-      dataIndex: "target",
-      // filters: [
-      //   { text: "Male", value: "male" },
-      //   { text: "Female", value: "female" },
-      // ],
-      sorter: true,
       width: "30%",
+      render: (target) => {
+        return (
+          <Link to={"/detail-domain/" + target.targetId}>{target.target}</Link>
+        );
+      },
     },
     {
       title: "Lỗ hổng",
       width: "30%",
-      sorter: true,
+      sorter: (a, b) => {
+        return a.overview.high - b.overview.high;
+      },
+
       render: (target) => {
         return (
           <Space>
             <Button
               type="text"
-              style={{ backgroundColor: "#ff6666", color: "white" }}
+              style={{ backgroundColor: config.HIGH, color: "white" }}
             >
               {target.overview.high}
             </Button>
             <Button
               type="text"
-              style={{ backgroundColor: "#ffd633", color: "white" }}
+              style={{ backgroundColor: config.MEDIUM, color: "white" }}
             >
               {target.overview.medium}
             </Button>
             <Button
               type="text"
-              style={{ backgroundColor: "#66ff33", color: "white" }}
+              style={{ backgroundColor: config.LOW, color: "white" }}
             >
               {target.overview.low}
             </Button>
             <Button
               type="text"
-              style={{ backgroundColor: "#3399ff", color: "white" }}
+              style={{ backgroundColor: config.INFO, color: "white" }}
             >
               {target.overview.info}
             </Button>
@@ -147,7 +155,7 @@ const TableDomain = () => {
     {
       title: "Trạng thái",
       width: "20%",
-      sorter: true,
+      sorter: (a,b) => {a.overview.scanStatus.localeCompare(b.overview.scanStatus);},
       render: (target) => {
         return <p>{target.overview.scanStatus}</p>;
       },
@@ -164,7 +172,7 @@ const TableDomain = () => {
     });
   };
 
-  const dateFormat = 'YYYY/MM/DD'
+  const dateFormat = "YYYY/MM/DD";
 
   return (
     <div>
@@ -181,18 +189,24 @@ const TableDomain = () => {
         </Col>
         <Col span={4}>
           <Space style={{ marginBottom: 16, float: "right" }} size={12}>
-            <RangePicker defaultValue={[moment(convertDate(time.timeStart), dateFormat), moment(convertDate(time.timeEnd), dateFormat)]} loading={loading}/>
+            <RangePicker
+              defaultValue={[
+                moment(convertDate(time.timeStart), dateFormat),
+                moment(convertDate(time.timeEnd), dateFormat),
+              ]}
+              loading={loading}
+            />
           </Space>
         </Col>
       </Row>
-        <Table
-          columns={columns}
-          dataSource={data}
-          pagination={pagination}
-          loading={loading}
-          onChange={handleTableChange}
-          size="small"
-        />
+      <Table
+        columns={columns}
+        dataSource={data}
+        pagination={pagination}
+        loading={loading}
+        onChange={handleTableChange}
+        size="small"
+      />
     </div>
   );
 };

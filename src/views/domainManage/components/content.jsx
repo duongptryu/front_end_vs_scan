@@ -15,6 +15,7 @@ import {
   notification,
 } from "antd";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import "../../dashboard/index.css";
 import {
   UserOutlined,
@@ -23,6 +24,10 @@ import {
   EditOutlined,
   DeleteOutlined,
   SecurityScanOutlined,
+  StopOutlined,
+  PauseCircleOutlined,
+  CaretRightOutlined,
+  UnorderedListOutlined
 } from "@ant-design/icons";
 import config from "../../../config";
 const axios = require("axios").default;
@@ -41,17 +46,6 @@ const formItemLayout = {
   },
 };
 
-const menuAction = (
-  <Menu>
-    <Menu.Item key="1" icon={<SecurityScanOutlined />}>
-      Scan
-    </Menu.Item>
-    <Menu.Item key="2" icon={<DeleteOutlined />}>
-      Xóa
-    </Menu.Item>
-  </Menu>
-);
-
 const getRandomuserParams = (params) => ({
   results: params.pagination.pageSize,
   page: params.pagination.current,
@@ -68,9 +62,9 @@ const Content_ = () => {
   const [visibleCreate, setVisibleCreate] = useState(false);
   const [visibleConfirm, setVisibleConfirm] = useState(false);
   const [idVerify, setIdVerify] = useState();
-  const [selectedRow, setSelectedRow] = useState(true);
 
   useEffect(() => {
+    document.title = "Chi tiết domain - Quản lý domain";
     fetch({ pagination });
   }, []);
 
@@ -81,10 +75,7 @@ const Content_ = () => {
   const handleChangeSchedule = (target, p) => {
     console.log(target.targetId);
     const token = localStorage.getItem("accessToken");
-    if (token == null || token == "") {
-      window.location = "/signin";
-      return false;
-    }
+    checkToken(token);
     setLoading(true);
     let data = {};
     if (p == 1) {
@@ -238,16 +229,92 @@ const Content_ = () => {
     }
   };
 
+  const menuAction = (target) => {
+    if (target.scanStatus == "processing" || target.scanStatus == "running") {
+      return (
+        <Menu theme="light">
+          <Menu.Item key="1">
+            <Button
+              type="primary"
+              onClick={() => {
+                handlePaused(target);
+              }}
+              style={{ width:"100%" }}
+            >
+              <PauseCircleOutlined /> Pause
+            </Button>
+          </Menu.Item>
+          <Menu.Item key="2">
+            <Button
+              type="primary"
+              onClick={() => {
+                handleStop(target);
+              }}
+              style={{ width:"100%" }}
+            >
+              <StopOutlined /> Stop
+            </Button>
+          </Menu.Item>
+        </Menu>
+      );
+    } else if (
+      target.scanStatus == "pending" ||
+      target.scanStatus == "completed" ||
+      target.scanStatus == "cancel"
+    ) {
+      return (
+        <Menu theme="light">
+          <Menu.Item key="1">
+            <Button
+              type="primary"
+              onClick={() => {
+                startScan(target);
+              }}
+            >
+              <SecurityScanOutlined /> Scan
+            </Button>
+          </Menu.Item>
+        </Menu>
+      );
+    } else {
+      return (
+        <div>
+          <Menu theme="light">
+            <Menu.Item key="1">
+              <Button
+                type="primary"
+                onClick={() => {
+                  handleStop(target);
+                }}
+                style={{width:"100%" }}
+              >
+                <StopOutlined /> Stop
+              </Button>
+            </Menu.Item>
+            <Menu.Item key="1">
+              <Button
+                type="primary"
+                onClick={() => {
+                  handleResume(target);
+                }}
+                style={{width:"80%"}}
+              >
+                <CaretRightOutlined /> Resume
+              </Button>
+            </Menu.Item>
+          </Menu>
+        </div>
+      );
+    }
+  };
+
   const handleAddDomain = (e) => {
     setLoading(true);
     const data = document.querySelector("#domains").innerHTML;
     const arr = data.split(",");
 
     const token = localStorage.getItem("accessToken");
-    if (token == null || token == "") {
-      window.location = "/signin";
-      return false;
-    }
+    checkToken(token);
 
     axios({
       method: "POST",
@@ -303,10 +370,7 @@ const Content_ = () => {
   const handleSwitch = (target) => {
     console.log(target.targetId);
     const token = localStorage.getItem("accessToken");
-    if (token == null || token == "") {
-      window.location = "/signin";
-      return false;
-    }
+    checkToken(token);
     setLoading(true);
     let data = {};
     if (target.isScan) {
@@ -359,24 +423,179 @@ const Content_ = () => {
       });
   };
 
+  const convertTimeToSeconds = (dateTime) => {
+    let arrDateTime = dateTime.split(" ");
+    var d = new Date(arrDateTime[0].replace(":", "-") + " " + arrDateTime[1]);
+    return d.getSeconds();
+  };
+
+  
+  const handlePaused = (target) => {
+    const token = localStorage.getItem("accessToken");
+    checkToken(token);
+    setLoading(true);
+    let data = {targetIds: [target.targetId]};
+
+    axios({
+      method: "POST",
+      url: config.API_URL + config.API_VR + "tasks/scan/pause",
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+      data: data,
+    })
+      .then((res) => {
+        console.log(res);
+        if (res.data.status_code == 0) {
+          notification.open({
+            message: "Thông báo lỗi",
+            description: "Không thể thực hiện yêu cầu, vui lòng thử lại sau"
+          });
+          setLoading(false);
+          return false;
+        } else {
+          notification.open({
+            message: "Thông báo",
+            description: "Thành công",
+          });
+          setLoading(false);
+          setVisibleCreate(false);
+          fetch({ pagination });
+        }
+      })
+      .catch((err) => {
+        notification.open({
+          message: "Thông báo lỗi",
+          description: "Vui lòng thử lại sau",
+        });
+        setVisibleCreate(false);
+        setLoading(false);
+        return false;
+      });
+  };
+
+
+  const handleStop = (target) => {
+    const token = localStorage.getItem("accessToken");
+    checkToken(token);
+    setLoading(true);
+    let data = {targetIds: [target.targetId]};
+
+    axios({
+      method: "POST",
+      url: config.API_URL + config.API_VR + "tasks/scan/stop",
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+      data: data,
+    })
+      .then((res) => {
+        console.log(res);
+        if (res.data.status_code == 0) {
+          notification.open({
+            message: "Thông báo lỗi",
+            description: "Không thể thực hiện yêu cầu, vui lòng thử lại sau"
+          });
+          setLoading(false);
+          return false;
+        } else {
+          notification.open({
+            message: "Thông báo",
+            description: "Thành công",
+          });
+          setLoading(false);
+          setVisibleCreate(false);
+          fetch({ pagination });
+        }
+      })
+      .catch((err) => {
+        notification.open({
+          message: "Thông báo lỗi",
+          description: "Vui lòng thử lại sau",
+        });
+        setVisibleCreate(false);
+        setLoading(false);
+        return false;
+      });
+  };
+
+  const handleResume = (target) => {
+    const token = localStorage.getItem("accessToken");
+    checkToken(token);
+    setLoading(true);
+    let data = {targetIds: [target.targetId]};
+
+    axios({
+      method: "POST",
+      url: config.API_URL + config.API_VR + "tasks/scan/resume",
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+      data: data,
+    })
+      .then((res) => {
+        console.log(res);
+        if (res.data.status_code == 0) {
+          notification.open({
+            message: "Thông báo lỗi",
+            description: "Không thể thực hiện yêu cầu, vui lòng thử lại sau"
+          });
+          setLoading(false);
+          return false;
+        } else {
+          notification.open({
+            message: "Thông báo",
+            description: "Thành công",
+          });
+          setLoading(false);
+          setVisibleCreate(false);
+          fetch({ pagination });
+        }
+      })
+      .catch((err) => {
+        notification.open({
+          message: "Thông báo lỗi",
+          description: "Vui lòng thử lại sau",
+        });
+        setVisibleCreate(false);
+        setLoading(false);
+        return false;
+      });
+  };
+
   const columns = [
     {
       title: "Thời gian cập nhật",
       dataIndex: "updateTime",
-      sorter: true,
+      sorter: (a, b) => {
+        return (
+          convertTimeToSeconds(a.updateTime) -
+          convertTimeToSeconds(b.updateTime)
+        );
+      },
       width: "20%",
     },
     {
       title: "Domain",
-      dataIndex: "target",
-      sorter: true,
-      width: "30%",
+      width: "15%",
+      render: (target) => {
+        return (
+          <Link to={"/detail-domain/" + target.targetId}>{target.target}</Link>
+        );
+      },
     },
     {
       title: "Lập lịch",
-      width: "20%",
+      width: "15%",
       key: "scanSchedule",
-      sorter: true,
+      align: "center",
+      sorter: (a, b) => a.isScan - b.isScan,
       render: (target) => {
         return (
           <Space>
@@ -408,7 +627,10 @@ const Content_ = () => {
     {
       title: "Xác thực",
       width: "10%",
-      sorter: true,
+      align: "center",
+      sorter: (a, b) => {
+        return a.isVerify - b.isVerify;
+      },
       render: (target) => {
         return (
           <>
@@ -416,8 +638,8 @@ const Content_ = () => {
               <Button
                 type="text"
                 ghost
-                style={{ 
-                  backgroundColor: "#00BFFF", 
+                style={{
+                  backgroundColor: "#00BFFF",
                   color: "white",
                   width: "100%",
                 }}
@@ -439,38 +661,37 @@ const Content_ = () => {
                   confirmHandleBtn(target);
                 }}
               >
-                 Xác thực 
+                Xác thực
               </Button>
             )}
           </>
         );
       },
     },
-    {},
-    {},
+    {
+      title: "Trạng thái",
+      dataIndex: "scanStatus",
+      width: "15%",
+      align: "center",
+      sorter: (a, b) => {
+        return a.scanStatus.localeCompare(b.scanStatus);
+      },
+    },
     {
       title: "Tùy chọn",
-      width: "15%",
+      width: "20%",
+      align: "center",
+      sorter: (a, b) => {
+        return a.scanStatus.localeCompare(b.scanStatus);
+      },
       render: (target) => {
         return (
           <Space>
-            {(target.scanStatus == "processing" ||
-              target.scanStatus == "running") && (
-              <Button type="primary" disabled>
-                <SecurityScanOutlined /> Scan
+            <Dropdown overlay={menuAction(target)}>
+              <Button type="text" disabled>
+              <UnorderedListOutlined />
               </Button>
-            )}
-            {(target.scanStatus == "pending" ||
-              target.scanStatus == "completed") && (
-              <Button
-                type="primary"
-                onClick={() => {
-                  startScan(target);
-                }}
-              >
-                <SecurityScanOutlined /> Scan
-              </Button>
-            )}
+            </Dropdown>
             <Button
               type="text"
               onClick={() => {
@@ -494,10 +715,7 @@ const Content_ = () => {
     setLoading(true);
 
     const token = localStorage.getItem("accessToken");
-    if (token == null || token == "") {
-      window.location = "/signin";
-      return false;
-    }
+    checkToken(token);
 
     axios({
       method: "POST",
@@ -542,10 +760,7 @@ const Content_ = () => {
     setLoading(true);
 
     const token = localStorage.getItem("accessToken");
-    if (token == null || token == "") {
-      window.location = "/signin";
-      return false;
-    }
+    checkToken(token);
 
     axios({
       method: "POST",
@@ -602,10 +817,7 @@ const Content_ = () => {
     setLoading(true);
 
     const token = localStorage.getItem("accessToken");
-    if (token == null || token == "") {
-      window.location = "/signin";
-      return false;
-    }
+    checkToken(token);
 
     axios({
       method: "GET",
@@ -617,6 +829,7 @@ const Content_ = () => {
       },
     })
       .then((res) => {
+        console.log(res);
         if (res.data.status_code == 0) {
           setLoading(false);
           notification.open({
@@ -638,10 +851,29 @@ const Content_ = () => {
         }
       })
       .catch((err) => {
-        console.log(err);
-        window.location = "/signin";
-        return false;
+        checkError(err);
       });
+  };
+
+  const checkError = (err) => {
+    if (err.response.status == 401) {
+      window.location = "/signin";
+      return false;
+    } else {
+      setLoading(false);
+      notification.open({
+        message: "Thông báo lỗi",
+        description: err.response.data,
+      });
+      return false;
+    }
+  };
+
+  const checkToken = (token) => {
+    if (token == null || token == "") {
+      window.location = "/signin";
+      return false;
+    }
   };
 
   const handleGetVerifyCode = () => {
@@ -655,10 +887,7 @@ const Content_ = () => {
       return false;
     }
     const token = localStorage.getItem("accessToken");
-    if (token == null || token == "") {
-      window.location = "/signin";
-      return false;
-    }
+    checkToken(token);
 
     axios({
       method: "GET",
@@ -689,9 +918,7 @@ const Content_ = () => {
         }
       })
       .catch((err) => {
-        console.log(err);
-        window.location = "/signin";
-        return false;
+        checkError(err);
       });
   };
 
@@ -706,10 +933,7 @@ const Content_ = () => {
       return false;
     }
     const token = localStorage.getItem("accessToken");
-    if (token == null || token == "") {
-      window.location = "/signin";
-      return false;
-    }
+    checkToken(token);
 
     axios({
       method: "GET",
@@ -810,10 +1034,7 @@ const Content_ = () => {
     setLoading(true);
     setScanPopUp(false);
     const token = localStorage.getItem("accessToken");
-    if (token == null || token == "") {
-      window.location = "/signin";
-      return false;
-    }
+    checkToken(token);
 
     if (targetsID.length == 0) {
       notification.open({
@@ -869,10 +1090,7 @@ const Content_ = () => {
     setLoading(true);
 
     const token = localStorage.getItem("accessToken");
-    if (token == null || token == "") {
-      window.location = "/signin";
-      return false;
-    }
+    checkToken(token);
     if (selectedRowKeys.length == 0) {
       notification.open({
         message: "Thông báo lỗi",
@@ -929,8 +1147,8 @@ const Content_ = () => {
         <div style={{ marginBottom: "20px" }}>
           <h1>Danh sách Domain</h1>
           <Row>
-          <Col span={3.5} style={{display: "flex"}}>
-              <Space style={{float: "right" }}>
+            <Col span={3.5} style={{ display: "flex" }}>
+              <Space style={{ float: "right" }}>
                 <Button
                   size="medium"
                   icon={<FileAddOutlined />}
@@ -943,7 +1161,7 @@ const Content_ = () => {
                   title="Thêm mới domain"
                   onOk={handleAddDomain}
                   onCancel={handleCancel}
-                  loading={true}
+                  loading={loading}
                   footer={[
                     <Button key="back" onClick={handleCancel}>
                       Hủy
@@ -1000,8 +1218,8 @@ const Content_ = () => {
                 </Button>
               </Space>
             </Col>
-            <Col span={6} style={{display: "flex"}}>
-              <Space  style={{float: "right" }}>
+            <Col span={6} style={{ display: "flex" }}>
+              <Space style={{ float: "right" }}>
                 <Search
                   placeholder="input search text"
                   enterButton="Search"
