@@ -17,6 +17,7 @@ import {
   import TableDomain from "./table_domain";
   import TableWkn from "./table_weakness"
   
+  
   const { Content } = Layout;
   const { Search } = Input;
   

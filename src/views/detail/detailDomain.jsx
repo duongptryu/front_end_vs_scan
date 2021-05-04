@@ -21,7 +21,7 @@ const DetailDomain = () => {
         <Layout style={{ marginLeft: "15%" }}>
           <Header_></Header_>
           <detailDomainContext.Provider value={{id, time}}>
-            <ContentDomain></ContentDomain>
+            <ContentDomain id={id}></ContentDomain>
           </detailDomainContext.Provider>
           <Footer_></Footer_>
         </Layout>

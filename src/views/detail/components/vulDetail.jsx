@@ -84,7 +84,8 @@ const VulDetail = (props) => {
           </Col>
         </Row>
         <Row>
-          <Divider orientation="left">Thông tin lỗ hổng</Divider>
+        <Divider/>
+        <h1 style = {{fontSize:"25px"}}>Thông tin lỗ hổng</h1>
         </Row>
         <Row style={{ marginBottom: "20px" }}>
           <Space direction="vertical">
@@ -113,11 +114,13 @@ const VulDetail = (props) => {
             </Title>
             <br />
           </Space>
-          <Divider orientation="left">Các điểm bị ảnh hưởng</Divider>
+          <Divider/>
+          <h1 style = {{fontSize:"25px"}}>Các điểm bị ảnh hưởng</h1>
+          <div>
           {effectedDomain.map((target) => {
             return (
-              <div>
-                <Space direction="vertical">
+              <div style={{ display:"block"}}>
+                <Space direction="vertical"> 
                   <h3>
                     <b>Endpoint:</b> {target.url}{" "}
                   </h3>
@@ -136,6 +139,7 @@ const VulDetail = (props) => {
               </div>
             );
           })}
+          </div>
         </Row>
       </Spin>
     </div>

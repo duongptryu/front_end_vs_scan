@@ -49,7 +49,8 @@ const DetailVuln = () => {
                       </detailDomainContext.Provider>
                     )}
                     {
-                      id==undefined && (<RightSide/>)
+                      
+                      id==undefined && (<RightSide id={vulnID}/>)
                     }
                   </Col>
                 </Row>
