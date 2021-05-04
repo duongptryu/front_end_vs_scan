@@ -42,7 +42,7 @@ const DetailVuln = () => {
                   <Col span={16}>
                     <VulDetail id={vulnID}></VulDetail>
                   </Col>
-                  <Col span={7} style={{ marginLeft: "50px" }}>
+                  <Col span={7} style={{ marginLeft: "20px" }}>
                     {id && (
                       <detailDomainContext.Provider value={{ id }}>
                         <Detail></Detail>

@@ -103,7 +103,7 @@ const VulsByDate = (props) => {
             color="blue"
             title="Trung bình"
             backgroundColor={config.MEDIUM}
-            number={overview.high}
+            number={overview.medium}
             loading={loading}
           ></NumberCard>
         </Col>
@@ -113,7 +113,7 @@ const VulsByDate = (props) => {
             color="blue"
             title="Thấp"
             backgroundColor={config.LOW}
-            number={overview.high}
+            number={overview.low}
             loading={loading}
           ></NumberCard>
         </Col>
@@ -123,7 +123,7 @@ const VulsByDate = (props) => {
             color="blue"
             title="Thông tin"
             backgroundColor={config.INFO}
-            number={overview.high}
+            number={overview.info}
             loading={loading}
           ></NumberCard>
         </Col>

@@ -165,7 +165,7 @@ const Detail= () => {
         </Space>
       </Row>
       <Row>
-        <Pie {...config_pie} width={400}/>
+        <Pie {...config_pie} width={300}/>
       </Row>
     </div>
   );

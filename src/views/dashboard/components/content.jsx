@@ -79,31 +79,31 @@ const Content_ = () => {
       </div>
       <Divider orientation="left">Tổng hợp</Divider>
       <Row gutter={[48, 16]} justify="center">
-        <Col span={6}>
+        <Col span={7}>
           <NumberCard
             icon={<FileSearchOutlined />}
             color="blue"
-            title="Tổng số domain rà quét"
+            title="Tổng domain"
             backgroundColor="#b380ff"
             loading={loading}
-            number={overview.severity}
+            number={overview.numberTargets}
             ></NumberCard>
         </Col>
-        <Col span={6}>
+        <Col span={7}>
           <NumberCard
             icon={<ExclamationOutlined />}
             color="red"
-            title="Tổng số lỗ hổng"
+            title="Lỗ hổng"
             backgroundColor="#0099ff"
             loading={loading}
-            number={overview.numberTargets}
+            number={overview.severity}
           ></NumberCard>
         </Col>
-        <Col span={6}>
+        <Col span={7}>
           <NumberCard
             icon={<MonitorOutlined />}
             color="red"
-            title="Các IP chưa rà quét"
+            title="Domain chưa rà soát"
             backgroundColor="#66ff66"
             loading={loading}
             number={overview.notScantargets}

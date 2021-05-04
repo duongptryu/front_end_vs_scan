@@ -106,38 +106,38 @@ const ContentUser = (props) => {
             <h1 style={{ fontSize: "35px" }}>Thông tin người dùng</h1>
             <Space direction="vertical">
               <Space direction="horizontal">
-                <Title level={4}>Tên người dùng: </Title>{" "}
-                <p style={{ paddingTop: "5px", fontSize: "20px" }}>
+                <Title level={5}>Tên người dùng: </Title>{" "}
+                <p style={{ paddingTop: "5px", fontSize: "14px" }}>
                   {props.user.fullName}
                 </p>
               </Space>
               <Space>
-                <Title level={4}>Email: </Title>
-                <p style={{ paddingTop: "5px", fontSize: "20px" }}>
+                <Title level={5}>Email: </Title>
+                <p style={{ paddingTop: "5px", fontSize: "14px" }}>
                   {props.user.email}
                 </p>
               </Space>
               <Space>
-                <Title level={4}>Số điện thoại: </Title>
-                <p style={{ paddingTop: "5px", fontSize: "20px" }}>
+                <Title level={5}>Số điện thoại: </Title>
+                <p style={{ paddingTop: "5px", fontSize: "14px" }}>
                   {props.user.phone}
                 </p>
               </Space>
               <Space>
-                <Title level={4}>Địa chỉ: </Title>
-                <p style={{ paddingTop: "5px", fontSize: "20px" }}>
+                <Title level={5}>Địa chỉ: </Title>
+                <p style={{ paddingTop: "5px", fontSize: "14px" }}>
                   {props.user.address}
                 </p>
               </Space>
               <Space>
-                <Title level={4}>Ngày tham gia: </Title>
-                <p style={{ paddingTop: "5px", fontSize: "20px" }}>
+                <Title level={5}>Ngày tham gia: </Title>
+                <p style={{ paddingTop: "5px", fontSize: "14px" }}>
                   {props.user.createTime}
                 </p>
               </Space>
               <Space>
-                <Title level={4}>Ngày cập nhật cuối: </Title>
-                <p style={{ paddingTop: "5px", fontSize: "20px" }}>
+                <Title level={5}>Ngày cập nhật cuối: </Title>
+                <p style={{ paddingTop: "5px", fontSize: "14px" }}>
                   {props.user.updateTime}
                 </p>
               </Space>
