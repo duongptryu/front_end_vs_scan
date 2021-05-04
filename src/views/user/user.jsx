@@ -40,7 +40,6 @@ const User = () => {
       .catch((err) => {
         console.log(err)
         setLoading(false);
-        // console.log(err.response.status);
         if (err.response.status == 401) {
           window.location = "/signin";
         } else {
