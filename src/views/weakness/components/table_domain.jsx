@@ -174,9 +174,54 @@ const TableDomain = () => {
 
   const dateFormat = "YYYY/MM/DD";
 
+  const handleSearch = (e) => {
+    setLoading(true);
+
+    const token = localStorage.getItem("accessToken");
+    // checkToken(token); 
+
+    axios({
+      method: "GET",
+      url: config.API_URL + config.API_VR + `tasks/host/search?keyword=${e}`,
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+    })
+      .then((res) => {
+        setLoading(false)
+        if(res.data.status_code == 0){
+          notification.open({
+            message: "Thông báo",
+            description: res.data.msg,
+          });
+        }else {
+          console.log(res)
+          setData(res.data.hostOverviews)
+          // let data = res.data.targets;
+          // for (let i = 0; i < data.length; i++) {
+          //   data[i]["key"] = data[i].targetId;
+          // }
+          // setData(data);
+          // setPagination({
+          //   ...pagination,
+          //   total: res.data.targets.length,
+          // });
+        }
+      })
+      .catch((err) => {
+        notification.open({
+          message: "Thông báo",
+          description: "Hệ thông đang bận, vui lòng thử lại sau",
+        });
+        setLoading(false);
+      });
+  }
+
   return (
     <div>
-      <Row>
+      <Row style={{marginBottom:"30px"}}>
         <Col span={12}>
           <Space>
             <Search
@@ -184,10 +229,11 @@ const TableDomain = () => {
               enterButton="Search"
               size="medium"
               width="200px"
+              onSearch={handleSearch}
             />
           </Space>
         </Col>
-        <Col span={4}>
+        {/* <Col span={4}>
           <Space style={{ marginBottom: 16, float: "right" }} size={12}>
             <RangePicker
               defaultValue={[
@@ -197,7 +243,7 @@ const TableDomain = () => {
               loading={loading}
             />
           </Space>
-        </Col>
+        </Col> */}
       </Row>
       <Table
         columns={columns}

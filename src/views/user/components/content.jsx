@@ -9,6 +9,7 @@ import {
   Form,
   Input,
   notification,
+  Spin
 } from "antd";
 import { useState, useEffect } from "react";
 import { Redirect } from "react-router-dom";
@@ -33,10 +34,12 @@ const ContentUser = (props) => {
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(false);
   const [form] = Form.useForm();
+  const [changeProfile, setChangeProfile] = useState(false)
 
   const onCancel = () => {
     setVisible(false);
     setLoading(false);
+    setChangeProfile(false)
   };
 
   const onSubmit = (e) => {
@@ -59,6 +62,7 @@ const ContentUser = (props) => {
       .then((res) => {
         if (res.data.status_code == 0) {
           setLoading(false)
+          setVisible(false)
           notification.open({
             message: "Thông báo lỗi",
             description: res.data.msg,
@@ -85,8 +89,62 @@ const ContentUser = (props) => {
     form.resetFields();
   };
 
+
+  const onSubmitChange = (e) => {
+    setLoading(true);
+    const data = e;
+    const token = localStorage.getItem("accessToken");
+    if (token == null || !token) {
+      return <Redirect to="/signin" />;
+    }
+    axios({
+      method: "POST",
+      url: config.API_URL + config.API_VR + `tasks/user/update`,
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+      data: data,
+    })
+      .then((res) => {
+        if (res.data.status_code == 0) {
+          setLoading(false)
+          setChangeProfile(false)
+          notification.open({
+            message: "Thông báo lỗi",
+            description: res.data.msg,
+          });
+          return
+        } else {
+          setLoading(false)
+          setChangeProfile(false)
+          notification.open({
+            message: "Thông báo",
+            description: "Thay đổi thông tin thành công",
+          });
+        }
+      })
+      .catch((err) => {
+        setLoading(false);
+        console.log(err);
+        if (err.response.status == 401) {
+          return <Redirect to="/signin" />;
+        } else {
+          notification.open({
+            message: "Thông báo lỗi",
+            description: "Hệ thống lỗi",
+          });
+        }
+      });
+    form.resetFields();
+  };
+  
+
+
   return (
     <div style={{ marginRight: "10px", marginLeft: "20px", height: "80vh" }}>
+      <Spin spinning={loading}>
       <div style={{ marginTop: "20px" }}>
         <Row>
           <Col span={24}>Thông tin người dùng / </Col>
@@ -106,10 +164,8 @@ const ContentUser = (props) => {
             <h1 style={{ fontSize: "35px" }}>Thông tin người dùng</h1>
             <Space direction="vertical">
               <Space direction="horizontal">
-                <Title level={5}>Tên người dùng: </Title>{" "}
-                <p style={{ paddingTop: "5px", fontSize: "14px" }}>
-                  {props.user.fullName}
-                </p>
+                <Title level={5}>Tên người dùng: </Title>{" "} <p style={{ paddingTop: "5px", fontSize: "14px" }}>{props.user.fullName}</p>
+                
               </Space>
               <Space>
                 <Title level={5}>Email: </Title>
@@ -141,14 +197,26 @@ const ContentUser = (props) => {
                   {props.user.updateTime}
                 </p>
               </Space>
+              <Space direction="horizontal">
+
               <Button
                 type="primary"
                 onClick={() => {
                   setVisible(true);
                 }}
-              >
+                >
                 Đổi mật khẩu
               </Button>
+              <Button
+                type="primary"
+                onClick={() => {
+                  setChangeProfile(true);
+                }}
+                style={{marginLeft:"50px"}}
+                >
+                Thay đổi thông tin cá nhân
+              </Button>
+                </Space>
             </Space>
           </Col>
         </Row>
@@ -156,7 +224,7 @@ const ContentUser = (props) => {
           visible={visible}
           title="Đổi mật khẩu"
           onCancel={onCancel}
-          loading={true}
+          loading={loading}
           footer={[
             <Button key="back" onClick={onCancel}>
               Hủy
@@ -208,7 +276,83 @@ const ContentUser = (props) => {
             </FormItem>
           </Form>
         </Modal>
+
+
+        <Modal
+          visible={changeProfile}
+          title="Thay đổi thông tin cá nhân"
+          onCancel={onCancel}
+          loading={loading}
+          footer={[
+            <Button key="back" onClick={onCancel}>
+              Hủy
+            </Button>,
+            <Button
+              key="submit"
+              type="primary"
+              loading={loading}
+              form="formProfile"
+              htmlType="submit"
+            >
+              Lưu
+            </Button>,
+          ]}
+          
+        >
+          <Form
+            name="control-ref"
+            layout="horizontal"
+            id="formProfile"
+            fields={[
+              {
+                name: ["fullName"],
+                value: props.user.fullName,
+              },
+              {
+                name: ["phone"],
+                value: props.user.phone,
+              },
+              {
+                name: ["address"],
+                value: props.user.address
+              },
+            ]}
+            onFinish={onSubmitChange}
+            form={form}
+          >
+            <FormItem
+              name="fullName"
+              rules={[{ required: true, message: "Yêu cầu nhập trường này!"}]}
+              label={`Tên người dùng`}
+              hasFeedback
+              {...formItemLayout}
+            >
+              <Input></Input>
+            </FormItem>
+            <FormItem
+              name="phone"
+              rules={[{ required: true, message: "Yêu cầu nhập trường này!" }]}
+              label={`Số điện thoại`}
+              hasFeedback
+              {...formItemLayout}
+            >
+              <Input></Input>
+            </FormItem>
+            <FormItem
+              name="address"
+              rules={[{ required: true, message: "Yêu cầu nhập trường này!" }]}
+              label={`Địa chỉ`}
+              hasFeedback
+              {...formItemLayout}
+            >
+              <Input></Input>
+            </FormItem>
+          </Form>
+        </Modal>
+
+
       </Content>
+      </Spin>
     </div>
   );
 };

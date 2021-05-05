@@ -33,10 +33,10 @@ const TableWkn = () => {
   const [time, setTime] = useState({
     timeStart: seconds - 604800,
     timeEnd: seconds,
-  })
+  });
 
   useEffect(() => {
-    document.title = "Quản lý lỗ hổng - Bảng domain"
+    document.title = "Quản lý lỗ hổng - Bảng domain";
     fetch({ time, pagination });
   }, []);
 
@@ -70,22 +70,22 @@ const TableWkn = () => {
     })
       .then((res) => {
         let data_res = [];
-        let data_high = []
-        let data_medium = []
-        let data_low = []
-        let data_info = []
+        let data_high = [];
+        let data_medium = [];
+        let data_low = [];
+        let data_info = [];
         for (var key in res.data.overviews.vulns) {
-          if(res.data.overviews.vulns[key].risk == "High"){
-            data_high.push({...res.data.overviews.vulns[key],"id":key})
-          }else if (res.data.overviews.vulns[key].risk == "Medium"){
-            data_medium.push({...res.data.overviews.vulns[key],"id":key})
-          }else if (res.data.overviews.vulns[key].risk == "Low"){
-            data_low.push({...res.data.overviews.vulns[key],"id":key})
-          }else {
-            data_info.push({...res.data.overviews.vulns[key],"id":key})
+          if (res.data.overviews.vulns[key].risk == "High") {
+            data_high.push({ ...res.data.overviews.vulns[key], id: key });
+          } else if (res.data.overviews.vulns[key].risk == "Medium") {
+            data_medium.push({ ...res.data.overviews.vulns[key], id: key });
+          } else if (res.data.overviews.vulns[key].risk == "Low") {
+            data_low.push({ ...res.data.overviews.vulns[key], id: key });
+          } else {
+            data_info.push({ ...res.data.overviews.vulns[key], id: key });
           }
         }
-        data_res= [...data_high,...data_medium,...data_low,...data_info]
+        data_res = [...data_high, ...data_medium, ...data_low, ...data_info];
         setData(data_res);
         setLoading(false);
         setPagination({
@@ -199,19 +199,25 @@ const TableWkn = () => {
     {
       title: "cwe",
       dataIndex: "cwe",
-      sorter: (a,b) => {return a.cwe - b.cwe},
+      sorter: (a, b) => {
+        return a.cwe - b.cwe;
+      },
       width: "10%",
     },
     {
       title: "Số domain bị ảnh hưởng",
       dataIndex: "countDomain",
-      sorter: (a,b) => {return a.countDomain - b.countDomain},
+      sorter: (a, b) => {
+        return a.countDomain - b.countDomain;
+      },
       width: "20%",
     },
     {
       title: "Tổng số endpoint bị ảnh hưởng",
       dataIndex: "count",
-      sorter: (a,b) => {return a.count - b.count},
+      sorter: (a, b) => {
+        return a.count - b.count;
+      },
       width: "40%",
     },
   ];
@@ -226,6 +232,60 @@ const TableWkn = () => {
     });
   };
 
+  const handleSearch = (e) => {
+    setLoading(true);
+
+    const token = localStorage.getItem("accessToken");
+    // checkToken(token);
+
+    axios({
+      method: "GET",
+      url: config.API_URL + config.API_VR + `tasks/vulns/search?keyword=${e}`,
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+    })
+      .then((res) => {
+        
+        setLoading(false);
+        if (res.data.status_code == 0) {
+          notification.open({
+            message: "Thông báo",
+            description: res.data.msg,
+          });
+        } else {
+          console.log(res);
+          let data_res = [];
+          let data_high = [];
+          let data_medium = [];
+          let data_low = [];
+          let data_info = [];
+          for (var key in res.data.vulns) {
+            if (res.data.vulns[key].risk == "High") {
+              data_high.push({ ...res.data.vulns[key], id: key });
+            } else if (res.data.vulns[key].risk == "Medium") {
+              data_medium.push({ ...res.data.vulns[key], id: key });
+            } else if (res.data.vulns[key].risk == "Low") {
+              data_low.push({ ...res.data.vulns[key], id: key });
+            } else {
+              data_info.push({ ...res.data.vulns[key], id: key });
+            }
+          }
+          data_res = [...data_high, ...data_medium, ...data_low, ...data_info];
+          setData(data_res);
+        }
+      })
+      .catch((err) => {
+        notification.open({
+          message: "Thông báo",
+          description: "Hệ thông đang bận, vui lòng thử lại sau",
+        });
+        setLoading(false);
+      });
+  };
+
   return (
     <div>
       <Row>
@@ -236,10 +296,11 @@ const TableWkn = () => {
               enterButton="Search"
               size="medium"
               width="200px"
+              onSearch={handleSearch}
             />
           </Space>
         </Col>
-        <Col span={4}>
+        {/* <Col span={4}>
           <Space style={{ marginBottom: 16, float: "right" }} size={12}>
             <RangePicker
               defaultValue={[
@@ -249,7 +310,7 @@ const TableWkn = () => {
               loading={loading}
             />
           </Space>
-        </Col>
+        </Col> */}
       </Row>
       <Table
         columns={columns}

@@ -1,5 +1,14 @@
 // import "antd/dist/antd.css";
-import { Row, Col, Layout, Space, Button, Input, notification, Spin } from "antd";
+import {
+  Row,
+  Col,
+  Layout,
+  Space,
+  Button,
+  Input,
+  notification,
+  Spin,
+} from "antd";
 import "../../dashboard/index.css";
 import { TableOutlined } from "@ant-design/icons";
 import TableVulns from "./tableVulns";
@@ -13,13 +22,14 @@ const { Content } = Layout;
 const { Search } = Input;
 
 const ContentDomain = (props) => {
-  console.log(props.id)
   const [table, setTable] = useState("TableVuln");
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState([]);
 
-
+  
   const startScan = () => {
     setLoading(true);
+    
 
     const token = localStorage.getItem("accessToken");
     if (token == null || token == "") {
@@ -53,7 +63,7 @@ const ContentDomain = (props) => {
             message: "Thông báo",
             description: "Hệ thống đang quét, vui lòng đợi trong giây lát",
           });
-          window.location.reload()
+          window.location.reload();
         }
       })
       .catch((err) => {
@@ -66,79 +76,76 @@ const ContentDomain = (props) => {
       });
   };
 
+
   return (
     <div style={{ marginRight: "10px", marginLeft: "20px" }}>
       <Spin spinning={loading}>
-      <div style={{ marginTop: "20px" }}>
-        <Row>
-          <Col span={24}>
-            <TableOutlined /> Quản lý domain / Thông tin chi tiết{" "}
-          </Col>
-        </Row>
-      </div>
-
-      <Content
-        style={{ marginTop: "20px", backgroundColor: "white", padding: "20px" }}
-      >
-        <div style={{ marginBottom: "20px" }}>
+        <div style={{ marginTop: "20px" }}>
           <Row>
-            <Col span={12}>
-              <h1>Thống kê lỗ hổng</h1>
-            </Col>
-            <Col span={8}>
-              <Search
-                placeholder="input search text"
-                allowClear
-                enterButton="Search"
-                size="large"
-              />
-            </Col>
-          </Row>
-          <Row style={{ marginBottom: "20px" }}>
-            <Button
-              size="medium"
-              style={{ backgroundColor: "#36d413", color: "white" }}
-              type="ghost"
-              onClick={startScan}
-            >
-              Scan
-            </Button>
-          </Row>
-          <Row>
-            <Col span={8}>
-              <Space>
-                <Button
-                  size="medium"
-                  type={table == "TableVuln" && "primary"}
-                  onClick={() => {
-                    setTable("TableVuln");
-                  }}
-                >
-                  Danh sách lỗ hổng
-                </Button>
-                <Button
-                  size="medium"
-                  type={table == "TableHistory" && "primary"}
-                  onClick={() => {
-                    setTable("TableHistory");
-                  }}
-                >
-                  Lịch sử
-                </Button>
-              </Space>
+            <Col span={24}>
+              <TableOutlined /> Quản lý domain / Thông tin chi tiết{" "}
             </Col>
           </Row>
         </div>
-        <Row>
-          <Col span={15} style={{ marginRight: "100px" }}>
-            {table == "TableVuln" && <TableVulns></TableVulns>}
-            {table == "TableHistory" && <TableHistory></TableHistory>}
-          </Col>
-          <Col span={6}>
-            <Detail></Detail>
-          </Col>
-        </Row>
-      </Content>
+
+        <Content
+          style={{
+            marginTop: "20px",
+            backgroundColor: "white",
+            padding: "20px",
+          }}
+        >
+          <div style={{ marginBottom: "20px" }}>
+            <Row>
+              <Col span={12}>
+                <h1>Thống kê lỗ hổng</h1>
+              </Col>
+            </Row>
+            <Row style={{ marginBottom: "20px" }}>
+              <Button
+                size="medium"
+                style={{ backgroundColor: "#36d413", color: "white" }}
+                type="ghost"
+                onClick={startScan}
+              >
+                Scan
+              </Button>
+            </Row>
+            <Row>
+              <Col span={8}>
+                <Space>
+                  <Button
+                    size="medium"
+                    type={table == "TableVuln" && "primary"}
+                    onClick={() => {
+                      setTable("TableVuln");
+                    }}
+                  >
+                    Danh sách lỗ hổng
+                  </Button>
+                  <Button
+                    size="medium"
+                    type={table == "TableHistory" && "primary"}
+                    onClick={() => {
+                      setTable("TableHistory");
+                    }}
+                  >
+                    Lịch sử
+                  </Button>
+                </Space>
+              </Col>
+            </Row>
+          </div>
+          <Row>
+            <Col span={15} style={{ marginRight: "100px" }}>
+              {table == "TableVuln" && <TableVulns data={data}></TableVulns>}
+              {table == "TableHistory" && <TableHistory></TableHistory>}
+            </Col>
+            <Col span={6}>
+              <Detail></Detail>
+            </Col>
+          </Row>
+        </Content>
       </Spin>
     </div>
   );

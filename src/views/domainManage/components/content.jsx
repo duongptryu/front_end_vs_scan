@@ -1131,8 +1131,55 @@ const Content_ = () => {
       });
   };
 
+
+  const handleSearch = (e) => {
+    setLoading(true);
+
+    const token = localStorage.getItem("accessToken");
+    checkToken(token);
+
+    axios({
+      method: "GET",
+      url: config.API_URL + config.API_VR + `tasks/target/search?keyword=${e}`,
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+    })
+      .then((res) => {
+        console.log(res)
+        setLoading(false)
+        if(res.data.status_code == 0){
+          notification.open({
+            message: "Thông báo",
+            description: res.data.msg,
+          });
+        }else {
+          let data = res.data.targets;
+          for (let i = 0; i < data.length; i++) {
+            data[i]["key"] = data[i].targetId;
+          }
+          setData(data);
+          console.log(data)
+          setPagination({
+            ...pagination,
+            total: res.data.targets.length,
+          });
+        }
+      })
+      .catch((err) => {
+        notification.open({
+          message: "Thông báo",
+          description: "Hệ thông đang bận, vui lòng thử lại sau",
+        });
+        setSelectedRowKeys([]);
+        setLoading(false);
+      });
+  }
+
   return (
-    <div style={{ marginRight: "10px", marginLeft: "20px" }}>
+    <div style={{ marginRight: "10px", marginLeft: "20px", height:"80vh" }}>
       <div style={{ marginTop: "20px" }}>
         <Row>
           <Col span={24}>
@@ -1225,6 +1272,7 @@ const Content_ = () => {
                   enterButton="Search"
                   size="medium"
                   width="200px"
+                  onSearch={handleSearch}
                 />
               </Space>
             </Col>

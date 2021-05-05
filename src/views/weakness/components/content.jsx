@@ -27,7 +27,7 @@ const Content_ = () => {
     const [table, setTable] = useState("TableDomain")
 
   return (
-    <div style={{ marginRight: "10px", marginLeft: "20px" }}>
+    <div style={{ marginRight: "10px", marginLeft: "20px", height:"85vh" }}>
       <div style={{ marginTop: "20px" }}>
         <Row>
           <Col span={24}>

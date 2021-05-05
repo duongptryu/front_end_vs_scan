@@ -70,7 +70,7 @@ const VulsByDate = (props) => {
   return (
     <div>
       <Row>
-        <Col span={24}>
+        {/* <Col span={24}>
           <div
             style={{ float: "right", marginRight: "10%", marginBottom: "20px" }}
           >
@@ -84,7 +84,7 @@ const VulsByDate = (props) => {
               />
             </Space>
           </div>
-        </Col>
+        </Col> */}
       </Row>
       <Row gutter={[16, 48]}>
         <Col span={6}>
