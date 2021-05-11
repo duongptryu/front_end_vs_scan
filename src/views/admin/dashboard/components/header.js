@@ -7,7 +7,7 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
 } from '@ant-design/icons'
-import config from "../../../config";
+import config from "../../../../config";
 
 const axios = require("axios").default;
 

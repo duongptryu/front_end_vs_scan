@@ -16,6 +16,7 @@ import Detail from "./detail";
 import { useState } from "react";
 import TableHistory from "./tableHistory";
 import config from "../../../config";
+import { saveAs } from "file-saver";
 const axios = require("axios").default;
 
 const { Content } = Layout;
@@ -26,11 +27,8 @@ const ContentDomain = (props) => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
 
-  
   const startScan = () => {
     setLoading(true);
-    
-
     const token = localStorage.getItem("accessToken");
     if (token == null || token == "") {
       window.location = "/signin";
@@ -76,6 +74,55 @@ const ContentDomain = (props) => {
       });
   };
 
+  const exportReport = () => {
+    setLoading(true);
+    const token = localStorage.getItem("accessToken");
+    if (token == null || token == "") {
+      window.location = "/signin";
+      return false;
+    }
+
+    let query = `tasks/vulns/report?targetId=${props.id}`;
+    if (props.time != undefined) {
+      query = query + `&historyIndexTime=${props.time}`;
+    }
+    notification.open({
+      message: "Thông báo",
+      description: "Chúng tôi đang xử lý, vui lòng đợi trong giây lát",
+    });
+
+    fetch(config.API_URL + config.API_VR + query, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/pdf",
+        Authorization: "Bearer " + token,
+      },
+    })
+      .then((response) => response.blob())
+      .then((blob) => {
+        // Create blob link to download
+        const url = window.URL.createObjectURL(new Blob([blob]));
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", `report.pdf`);
+
+        // Append to html link element page
+        document.body.appendChild(link);
+
+        // Start download
+        link.click();
+        setLoading(false);
+
+        // Clean up and remove the link
+        link.parentNode.removeChild(link);
+      }).catch(err => {
+        notification.open({
+          message: "Thông báo",
+          description: "Không thành công",
+        });
+        setLoading(false);
+      })
+  };
 
   return (
     <div style={{ marginRight: "10px", marginLeft: "20px" }}>
@@ -102,14 +149,24 @@ const ContentDomain = (props) => {
               </Col>
             </Row>
             <Row style={{ marginBottom: "20px" }}>
-              <Button
-                size="medium"
-                style={{ backgroundColor: "#36d413", color: "white" }}
-                type="ghost"
-                onClick={startScan}
-              >
-                Scan
-              </Button>
+              <Space direction="horizontal">
+                <Button
+                  size="medium"
+                  style={{ backgroundColor: "#36d413", color: "white" }}
+                  type="ghost"
+                  onClick={startScan}
+                >
+                  Scan
+                </Button>
+                <Button
+                  size="medium"
+                  style={{ backgroundColor: "red", color: "white" }}
+                  type="ghost"
+                  onClick={exportReport}
+                >
+                  Xuất báo cáo
+                </Button>
+              </Space>
             </Row>
             <Row>
               <Col span={8}>

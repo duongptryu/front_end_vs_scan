@@ -27,7 +27,7 @@ import {
   StopOutlined,
   PauseCircleOutlined,
   CaretRightOutlined,
-  UnorderedListOutlined
+  UnorderedListOutlined,
 } from "@ant-design/icons";
 import config from "../../../config";
 const axios = require("axios").default;
@@ -239,7 +239,7 @@ const Content_ = () => {
               onClick={() => {
                 handlePaused(target);
               }}
-              style={{ width:"100%" }}
+              style={{ width: "100%" }}
             >
               <PauseCircleOutlined /> Pause
             </Button>
@@ -250,7 +250,7 @@ const Content_ = () => {
               onClick={() => {
                 handleStop(target);
               }}
-              style={{ width:"100%" }}
+              style={{ width: "100%" }}
             >
               <StopOutlined /> Stop
             </Button>
@@ -286,7 +286,7 @@ const Content_ = () => {
                 onClick={() => {
                   handleStop(target);
                 }}
-                style={{width:"100%" }}
+                style={{ width: "100%" }}
               >
                 <StopOutlined /> Stop
               </Button>
@@ -297,7 +297,7 @@ const Content_ = () => {
                 onClick={() => {
                   handleResume(target);
                 }}
-                style={{width:"80%"}}
+                style={{ width: "80%" }}
               >
                 <CaretRightOutlined /> Resume
               </Button>
@@ -429,12 +429,11 @@ const Content_ = () => {
     return d.getSeconds();
   };
 
-  
   const handlePaused = (target) => {
     const token = localStorage.getItem("accessToken");
     checkToken(token);
     setLoading(true);
-    let data = {targetIds: [target.targetId]};
+    let data = { targetIds: [target.targetId] };
 
     axios({
       method: "POST",
@@ -451,7 +450,7 @@ const Content_ = () => {
         if (res.data.status_code == 0) {
           notification.open({
             message: "Thông báo lỗi",
-            description: "Không thể thực hiện yêu cầu, vui lòng thử lại sau"
+            description: "Không thể thực hiện yêu cầu, vui lòng thử lại sau",
           });
           setLoading(false);
           return false;
@@ -476,12 +475,11 @@ const Content_ = () => {
       });
   };
 
-
   const handleStop = (target) => {
     const token = localStorage.getItem("accessToken");
     checkToken(token);
     setLoading(true);
-    let data = {targetIds: [target.targetId]};
+    let data = { targetIds: [target.targetId] };
 
     axios({
       method: "POST",
@@ -498,7 +496,7 @@ const Content_ = () => {
         if (res.data.status_code == 0) {
           notification.open({
             message: "Thông báo lỗi",
-            description: "Không thể thực hiện yêu cầu, vui lòng thử lại sau"
+            description: "Không thể thực hiện yêu cầu, vui lòng thử lại sau",
           });
           setLoading(false);
           return false;
@@ -527,7 +525,7 @@ const Content_ = () => {
     const token = localStorage.getItem("accessToken");
     checkToken(token);
     setLoading(true);
-    let data = {targetIds: [target.targetId]};
+    let data = { targetIds: [target.targetId] };
 
     axios({
       method: "POST",
@@ -544,7 +542,7 @@ const Content_ = () => {
         if (res.data.status_code == 0) {
           notification.open({
             message: "Thông báo lỗi",
-            description: "Không thể thực hiện yêu cầu, vui lòng thử lại sau"
+            description: "Không thể thực hiện yêu cầu, vui lòng thử lại sau",
           });
           setLoading(false);
           return false;
@@ -689,7 +687,7 @@ const Content_ = () => {
           <Space>
             <Dropdown overlay={menuAction(target)}>
               <Button type="text" disabled>
-              <UnorderedListOutlined />
+                <UnorderedListOutlined />
               </Button>
             </Dropdown>
             <Button
@@ -888,6 +886,10 @@ const Content_ = () => {
     }
     const token = localStorage.getItem("accessToken");
     checkToken(token);
+    notification.open({
+      message: "Thông báo",
+      description: "Chúng tôi đang xử lý, vui lòng chờ trong giây lát",
+    });
 
     axios({
       method: "GET",
@@ -898,24 +900,26 @@ const Content_ = () => {
         id,
       // mode: "cors",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "text/html",
         Authorization: "Bearer " + token,
       },
     })
       .then((res) => {
-        if (res.data.status_code == 0) {
-          setLoading(false);
-          notification.open({
-            message: "Thông báo lỗi",
-            description: res.data.msg,
-          });
-          return false;
-        } else {
-          setLoading(false);
-          console.log(res.data.verifyCode);
-          document.querySelector("#displayCode").innerHTML =
-            "Code = " + res.data.verifyCode;
-        }
+        console.log(res);
+        const url = window.URL.createObjectURL(new Blob([res.data]));
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", `verify.html`);
+
+        // Append to html link element page
+        document.body.appendChild(link);
+
+        // Start download
+        link.click();
+        setLoading(false);
+
+        // Clean up and remove the link
+        link.parentNode.removeChild(link);
       })
       .catch((err) => {
         checkError(err);
@@ -934,7 +938,10 @@ const Content_ = () => {
     }
     const token = localStorage.getItem("accessToken");
     checkToken(token);
-
+    notification.open({
+      message: "Thông báo",
+      description: "Hệ thống đang kiếm tra, vui lòng chờ",
+    });
     axios({
       method: "GET",
       url:
@@ -945,18 +952,18 @@ const Content_ = () => {
       },
     })
       .then((res) => {
+        setLoading(false);
+        setVisibleConfirm(false);
+        setVisibleCreate(false);
         if (res.data.status_code == 0) {
           notification.open({
             message: "Thông báo lỗi",
-            description: res.data.msg,
+            description: "Xác thực không thành công, vui lòng thử lại sau",
           });
           return false;
         } else {
-          setLoading(false);
           console.log(res.data.verifyCode);
           alert("Xác thực thành công");
-          setVisibleConfirm(false);
-          setVisibleCreate(false);
         }
       })
       .catch((err) => {
@@ -1131,7 +1138,6 @@ const Content_ = () => {
       });
   };
 
-
   const handleSearch = (e) => {
     setLoading(true);
 
@@ -1148,20 +1154,20 @@ const Content_ = () => {
       },
     })
       .then((res) => {
-        console.log(res)
-        setLoading(false)
-        if(res.data.status_code == 0){
+        console.log(res);
+        setLoading(false);
+        if (res.data.status_code == 0) {
           notification.open({
             message: "Thông báo",
             description: res.data.msg,
           });
-        }else {
+        } else {
           let data = res.data.targets;
           for (let i = 0; i < data.length; i++) {
             data[i]["key"] = data[i].targetId;
           }
           setData(data);
-          console.log(data)
+          console.log(data);
           setPagination({
             ...pagination,
             total: res.data.targets.length,
@@ -1176,10 +1182,10 @@ const Content_ = () => {
         setSelectedRowKeys([]);
         setLoading(false);
       });
-  }
+  };
 
   return (
-    <div style={{ marginRight: "10px", marginLeft: "20px", height:"80vh" }}>
+    <div style={{ marginRight: "10px", marginLeft: "20px", height: "80vh" }}>
       <div style={{ marginTop: "20px" }}>
         <Row>
           <Col span={24}>
@@ -1281,21 +1287,42 @@ const Content_ = () => {
 
         <Modal
           visible={visibleConfirm}
+          loading={loading}
           title="Xác thực domain"
           onCancel={handleCancel}
           footer={[
-            <Button key="back" onClick={handleCancel}>
+            <Button key="back" onClick={handleCancel} loading={loading}>
               Cancle
             </Button>,
-            <Button key="submit" type="primary" onClick={handleGetVerifyCode}>
+            <Button
+              key="submit"
+              type="primary"
+              onClick={handleGetVerifyCode}
+              loading={loading}
+            >
               Lấy mã xác thực
             </Button>,
-            <Button key="link" type="primary" onClick={handleVerify}>
+            <Button
+              key="link"
+              type="primary"
+              onClick={handleVerify}
+              loading={loading}
+            >
               Xác thực
             </Button>,
           ]}
         >
-          <p id="displayCode">Viet cai gi do</p>
+          <div style={{ marginLeft: "10%" }}>
+            <h1 id="displayCode">Các bước xác thực</h1>
+            <p id="displayCode">
+              Bước 1: Vui lòng tải click vào nút tải file xác thực dưới đây{" "}
+            </p>
+            <p id="displayCode">
+              Bước 2: Upload file xác thực lên website của bạn theo URI:
+              domain.com/vscanner-check/verifycode{" "}
+            </p>
+            <p id="displayCode">Bước 3: Click vào button xác thực</p>
+          </div>
         </Modal>
 
         <Modal
