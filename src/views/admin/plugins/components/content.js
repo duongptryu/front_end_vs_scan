@@ -1,8 +1,9 @@
-import { Row, Col, Divider, Space, Button, Table } from "antd";
+import { Row, Col, Divider, Space, Button, Table, notification, Popconfirm } from "antd";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import config from "../../../../config";
-import reqwest from 'reqwest';
+const axios = require("axios").default;
+
 
 const Content_ = () => {
   const [loading, setLoading] = useState(false);
@@ -10,16 +11,11 @@ const Content_ = () => {
     current: 1,
     pageSize: 10,
   });
-  const [data,setData] = useState([])
-  const getRandomuserParams = (params) => ({
-    results: params.pagination.pageSize,
-    page: params.pagination.current,
-    ...params,
-  });
+  const [data, setData] = useState([]);
 
   useEffect(() => {
-    fetch({pagination})
-  },[])
+    fetch({ pagination });
+  }, []);
 
   const handleTableChange = (pagination, filters, sorter) => {
     fetch({
@@ -31,24 +27,49 @@ const Content_ = () => {
   };
 
   const fetch = (params = {}) => {
-    setLoading(true)
-    reqwest({
-      url: 'https://randomuser.me/api',
-      method: 'get',
-      type: 'json',
-      data: getRandomuserParams(params),
-    }).then(data => {
-      console.log(data);
-      setData(data.results)
-      setPagination({
-        pagination: {
-          ...params.pagination,
-          total: 200,
-        },
+    setLoading(true);
+    const token = localStorage.getItem("accessToken");
+    if (token == null || token == "") {
+      window.location = "/signin";
+      return false;
+    }
+
+    axios({
+      method: "GET",
+      url: config.API_URL + config.API_VR + `tasks/plugin/list`,
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+    })
+      .then((res) => {
+        setLoading(false);
+        console.log(res.data);
+        if (res.data.status_code == 1) {
+          setData(res.data.plugins);
+          setPagination({
+            ...params.pagination,
+            total: res.data.plugins.length,
+          });
+          console.log(data);
+        } else {
+          setData([]);
+        }
       })
-      setLoading(false)
-    });
-  }
+      .catch((err) => {
+        // if (err.response.status == 401) {
+        //   window.location.href = "/";
+        // } else {
+        setLoading(false);
+        setData([]);
+        notification.open({
+          message: "Thông báo lỗi",
+          description: "Vui lòng thử lại sau",
+        });
+        // }
+      });
+  };
 
   let x = 1;
   const columns = [
@@ -63,25 +84,84 @@ const Content_ = () => {
     },
     {
       title: "Mức độ",
-      dataIndex:"gender",
-      width: "20%",
+      dataIndex: "risk",
+      sorter: (a, b) => { 
+        const orders = { 'Low': 1, 'Medium': 2, 'High': 3, "Information": 4};
+        return orders[a.risk] - orders[b.risk];
+      },
+      filters: [
+        {
+          text: 'High',
+          value: 'High',
+        },
+        {
+          text: 'Medium',
+          value: 'Medium',
+        },
+        {
+          text: 'Low',
+          value: 'Low',
+        },
+        {
+          text: 'Information',
+          value: 'Information',
+        },
+      ],
+      onFilter: (value, record) => record.risk.indexOf(value) === 0,
+      width: "10%",
+      render: (risk) => {
+        if (risk == "High") {
+          return (
+            <Button
+              type="text"
+              style={{ backgroundColor: config.HIGH, color: "white", width:"90%" }}
+            >
+              {risk}
+            </Button>
+          );
+        } else if (risk == "Medium") {
+          return (
+            <Button
+              type="text"
+              style={{ backgroundColor: config.MEDIUM, color: "white", width:"90%"  }}
+            >
+              {risk}
+            </Button>
+          );
+        } else if (risk == "Low") {
+          return (
+            <Button
+              type="text"
+              style={{ backgroundColor: config.LOW, color: "white", width:"90%"  }}
+            >
+              {risk}
+            </Button>
+          );
+        } else {
+          return (
+            <Button
+              type="text"
+              style={{ backgroundColor: config.INFO, color: "white", width:"90%"  }}
+            >
+              {risk}
+            </Button>
+          );
+        }
+      },
     },
     {
       title: "Tên điểm yếu",
       width: "30%",
       render: (target) => {
         return (
-          <Link to={"/detail-domain/" + target.targetId}>{target.gender}</Link>
+          <Link to={"/admin/plugin/detail/" + target.pluginId}>{target.pluginName}</Link>
         );
       },
     },
     {
       title: "cwe",
-      dataIndex:"gender",
-      width: "30%",
-      sorter: (a, b) => {
-        return a.overview.high - b.overview.high;
-      },
+      dataIndex:"cweId",
+      width: "20%",
     },
     {
       title: "Action",
@@ -95,17 +175,31 @@ const Content_ = () => {
             >
               Sửa
             </Button>
-            <Button
-              type="primary"
-              style={{ width:"100%" }}
+            <Popconfirm
+              title="Bạn có chắc muốn xóa plugin này?"
+              onConfirm={confirm}
+              onCancel={cancel}
+              okText="Có"
+              cancelText="Không"
             >
+              <Button type="primary" style={{ width: "100%" }}>
               Xóa
             </Button>
+            </Popconfirm>
           </Space>
         );
       },
     },
   ];
+
+  const confirm = (e)=> {
+    console.log(e);
+
+  }
+  
+  const cancel = (e)=> {
+    console.log(e);
+  }
 
   return (
     <div
@@ -127,7 +221,6 @@ const Content_ = () => {
       <div style={{ margin: "2%" }}>
       <Table
         columns={columns}
-        rowKey={record => record.login.uuid}
         dataSource={data}
         pagination={pagination}
         loading={loading}

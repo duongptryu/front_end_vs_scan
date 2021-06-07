@@ -1,8 +1,31 @@
-import { Row, Col, Divider, Space, Button, Table } from "antd";
+import {
+  Row,
+  Col,
+  Divider,
+  Space,
+  Button,
+  Table,
+  notification,
+  Modal,
+  Form,
+  Input,
+  Popconfirm,
+} from "antd";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import config from "../../../../config";
-import reqwest from "reqwest";
+const axios = require("axios").default;
+
+const FormItem = Form.Item;
+
+const formItemLayout = {
+  labelCol: {
+    span: 6,
+  },
+  wrapperCol: {
+    span: 14,
+  },
+};
 
 const Content_ = () => {
   const [loading, setLoading] = useState(false);
@@ -11,11 +34,8 @@ const Content_ = () => {
     pageSize: 10,
   });
   const [data, setData] = useState([]);
-  const getRandomuserParams = (params) => ({
-    results: params.pagination.pageSize,
-    page: params.pagination.current,
-    ...params,
-  });
+  const [popUpData, setPopUpData] = useState([]);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     fetch({ pagination });
@@ -30,24 +50,68 @@ const Content_ = () => {
     });
   };
 
+  const handleEditUser = () => {
+    setVisible(false);
+  };
+
+  const handleCancel = () => {
+    setVisible(false);
+  };
+  const openPopUP = (userID) => {
+    for (let i = 0; i <= data.length; i++) {
+      if (data[i].userId == userID) {
+        setPopUpData(data[i]);
+        break;
+      }
+    }
+    setVisible(true);
+  };
+
   const fetch = (params = {}) => {
     setLoading(true);
-    reqwest({
-      url: "https://randomuser.me/api",
-      method: "get",
-      type: "json",
-      data: getRandomuserParams(params),
-    }).then((data) => {
-      console.log(data);
-      setData(data.results);
-      setPagination({
-        pagination: {
-          ...params.pagination,
-          total: 200,
-        },
+    const token = localStorage.getItem("accessToken");
+    if (token == null || token == "") {
+      window.location = "/signin";
+      return false;
+    }
+
+    axios({
+      method: "GET",
+      url: config.API_URL + config.API_VR + `tasks/user/list`,
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+    })
+      .then((res) => {
+        setLoading(false);
+        console.log(res.data);
+        if (res.data.status_code == 1) {
+          let x = res.data.allusers.activeUsers;
+          let y = x.concat(res.data.allusers.notActiveUsers);
+          setData(y);
+          setPagination({
+            ...params.pagination,
+            total: y,
+          });
+          console.log(data);
+        } else {
+          setData([]);
+        }
+      })
+      .catch((err) => {
+        // if (err.response.status == 401) {
+        //   window.location.href = "/";
+        // } else {
+        setLoading(false);
+        setData([]);
+        notification.open({
+          message: "Thông báo lỗi",
+          description: "Vui lòng thử lại sau",
+        });
+        // }
       });
-      setLoading(false);
-    });
   };
 
   let x = 1;
@@ -63,40 +127,28 @@ const Content_ = () => {
     },
     {
       title: "Ngày tạo",
-      dataIndex: "gender",
+      dataIndex: "createTime",
       width: "20%",
     },
     {
-      title: "Tên điểm yếu",
-      width: "30%",
-      render: (target) => {
-        return (
-          <Link to={"/detail-domain/" + target.targetId}>{target.gender}</Link>
-        );
-      },
-    },
-    {
       title: "Email",
-      dataIndex: "gender",
+      dataIndex: "email",
       width: "30%",
-      sorter: (a, b) => {
-        return a.overview.high - b.overview.high;
-      },
     },
     {
       title: "Tên người dùng",
-      dataIndex: "gender",
+      dataIndex: "fullName",
       width: "30%",
-      sorter: (a, b) => {
-        return a.overview.high - b.overview.high;
-      },
     },
     {
       title: "Trạng thái",
-      dataIndex: "gender",
       width: "30%",
-      sorter: (a, b) => {
-        return a.overview.high - b.overview.high;
+      render: (user) => {
+        if (user.isActive) {
+          return "Hoạt động";
+        } else {
+          return "Không hoạt động";
+        }
       },
     },
     {
@@ -104,18 +156,156 @@ const Content_ = () => {
       width: "20%",
       render: (target) => {
         return (
-          <Space>
-            <Button type="primary" style={{ width: "100%" }}>
-              Sửa
-            </Button>
-            <Button type="primary" style={{ width: "100%" }}>
-              Xóa
-            </Button>
-          </Space>
+            target.isActive ? (
+              <Space>
+              <Button
+                type="primary"
+                style={{ width: "100%" }}
+                onClick={() => {
+                  block(target.userId);
+                }}
+                disabled
+              >
+                Block
+              </Button>
+                <Button
+                type="primary"
+                style={{ width: "100%" }}
+                onClick={() => {
+                  unblock(target.userId);
+                }}
+              >
+                UnBlock
+              </Button>
+                 </Space>
+            ) : (
+              <Space>
+              <Button
+                type="primary"
+                style={{ width: "100%" }}
+                onClick={() => {
+                  block(target.userId);
+                }}
+              >
+                Block
+              </Button>
+                <Button
+                type="primary"
+                style={{ width: "100%" }}
+                onClick={() => {
+                  unblock(target.userId);
+                }}
+                disabled
+              >
+                UnBlock
+              </Button>
+                 </Space>
+            )
+       
         );
       },
     },
   ];
+
+  const block = (e) => {
+    setLoading(true);
+    const token = localStorage.getItem("accessToken");
+    if (token == null || token == "") {
+      window.location = "/signin";
+      return false;
+    }
+    let dataX = {
+      enable: [],
+      disable: [e],
+    };
+
+    axios({
+      method: "POST",
+      url: config.API_URL + config.API_VR + `tasks/user/status`,
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+      data: dataX,
+    })
+      .then((res) => {
+        setLoading(false);
+        console.log(res.data);
+        // if (res.data.status_code == 1) {
+        //   setData(res.data.allusers.activeUsers);
+        //   setPagination({
+        //     ...params.pagination,
+        //     total: res.data.allusers.activeUsers.length,
+        //   });
+        //   console.log(data);
+        // } else {
+        //   setData([]);
+        // }
+      })
+      .catch((err) => {
+        // if (err.response.status == 401) {
+        //   window.location.href = "/";
+        // } else {
+        setLoading(false);
+        setData([]);
+        notification.open({
+          message: "Thông báo lỗi",
+          description: "Vui lòng thử lại sau",
+        });
+        // }
+      });
+  };
+
+  const unblock = (e) => {
+    setLoading(true);
+    const token = localStorage.getItem("accessToken");
+    if (token == null || token == "") {
+      window.location = "/signin";
+      return false;
+    }
+    const dataX = {
+      enable: [e],
+      disable: [],
+    };
+
+    axios({
+      method: "POST",
+      url: config.API_URL + config.API_VR + `tasks/user/status`,
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+      data: dataX,
+    })
+      .then((res) => {
+        setLoading(false);
+        console.log(res.data);
+        // if (res.data.status_code == 1) {
+        //   setData(res.data.allusers.activeUsers);
+        //   setPagination({
+        //     ...params.pagination,
+        //     total: res.data.allusers.activeUsers.length,
+        //   });
+        //   console.log(data);
+        // } else {
+        //   setData([]);
+        // }
+      })
+      .catch((err) => {
+        // if (err.response.status == 401) {
+        //   window.location.href = "/";
+        // } else {
+        setLoading(false);
+        setData([]);
+        notification.open({
+          message: "Thông báo lỗi",
+          description: "Vui lòng thử lại sau",
+        });
+        // }
+      });
+  };
 
   return (
     <div
@@ -129,15 +319,15 @@ const Content_ = () => {
       <div>
         <Row>
           <Col span={12}>
-            <h1 style={{ fontSize: "30px" }}>Danh sách các plugin</h1>
+            <h1 style={{ fontSize: "30px" }}>Danh sách người dùng</h1>
           </Col>
         </Row>
       </div>
       <Divider></Divider>
+
       <div style={{ margin: "2%" }}>
         <Table
           columns={columns}
-          rowKey={(record) => record.login.uuid}
           dataSource={data}
           pagination={pagination}
           loading={loading}

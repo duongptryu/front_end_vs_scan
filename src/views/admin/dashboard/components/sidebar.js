@@ -43,9 +43,12 @@ const SideBar = () => {
             <Link to="/admin/plugin">Quản lý plugin</Link>
           </Menu.Item>
           <Menu.Item key="3" icon={<TableOutlined />}>
-            <Link to="/admin/users">Quản lý người dùng</Link>
+            <Link to="/admin/cve">Quản lý CVE</Link>
           </Menu.Item>
           <Menu.Item key="4" icon={<TableOutlined />}>
+            <Link to="/admin/users">Quản lý người dùng</Link>
+          </Menu.Item>
+          <Menu.Item key="5" icon={<TableOutlined />}>
             <Link to="/user/me">Tài khoản</Link>
           </Menu.Item>
         </Menu>
