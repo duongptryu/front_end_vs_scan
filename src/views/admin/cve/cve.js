@@ -9,6 +9,10 @@ import Content_ from "./components/content"
 // const axios = require("axios").default;
 
 const AdminCve = () => {
+  const role = localStorage.getItem("role")
+  if (role != 0) {
+    return window.location = "/"
+  }else {
   return (
     <div>
       <Layout>
@@ -22,5 +26,6 @@ const AdminCve = () => {
     </div>
   );
 };
+}
 
 export default AdminCve;

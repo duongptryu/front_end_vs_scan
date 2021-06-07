@@ -32,7 +32,7 @@ const Header_ = () => {
     }
     axios({
       method: "GET",
-      url: config.API_URL + config.API_VR + "tasks/user/profile",
+      url: config.API_URL + config.API_VR + "tasks/admin/profile",
       mode: "cors",
       credentials: "include",
       headers: {

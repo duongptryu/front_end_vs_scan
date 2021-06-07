@@ -23,14 +23,6 @@ const { Content } = Layout;
 const { Option } = Select;
 const { TextArea } = Input;
 
-const formItemLayout = {
-  labelCol: {
-    span: 8,
-  },
-  wrapperCol: {
-    span: 14,
-  },
-};
 
 const FormItem = Form.Item;
 
@@ -107,7 +99,7 @@ const DetailPlugin = () => {
     }
     let nameC, riskC, desC, solC, refC
     if (name == "") {
-      nameC = data.name
+      nameC = data.pluginName
     }else {
       nameC = name
     }
@@ -141,6 +133,7 @@ const DetailPlugin = () => {
       cweId: data.cweId,
       reference: refC
     }
+    console.log(dataUpdate)
 
     axios({
       method: "POST",
@@ -154,13 +147,19 @@ const DetailPlugin = () => {
       data:dataUpdate
     })
       .then((res) => {
-        // setLoading(false);
-        console.log(res.data);
-        // if (res.data.status_code == 1) {
-        //   setData(res.data.pluginInfo);
-        // } else {
-        //   setData();
-        // }
+        setLoading(false);
+        if (res.data.status_code == 1) {
+          notification.open({
+            message: "Thông báo",
+            description: "Cập nhật thành công",
+          });
+        } else {
+          notification.open({
+            message: "Thông báo",
+            description: "Cập nhật thất bại",
+          });
+        }
+        fetch({});
       })
       .catch((err) => {
         console.log(err)
@@ -173,6 +172,7 @@ const DetailPlugin = () => {
           message: "Thông báo lỗi",
           description: "Vui lòng thử lại sau",
         });
+        fetch({});
         // }
       });
   };

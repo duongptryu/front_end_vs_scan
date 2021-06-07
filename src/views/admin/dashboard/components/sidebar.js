@@ -48,9 +48,6 @@ const SideBar = () => {
           <Menu.Item key="4" icon={<TableOutlined />}>
             <Link to="/admin/users">Quản lý người dùng</Link>
           </Menu.Item>
-          <Menu.Item key="5" icon={<TableOutlined />}>
-            <Link to="/user/me">Tài khoản</Link>
-          </Menu.Item>
         </Menu>
       </Sider>
     </>

@@ -51,6 +51,7 @@ const AdminSignIn = () => {
         } else {
           const accessToken = res.data.accessToken;
           localStorage.setItem("accessToken", accessToken);
+          localStorage.setItem("role", "0");
           notification.open({
             message: "Thông báo",
             description: "Xác thực thành công",

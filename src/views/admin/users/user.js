@@ -9,8 +9,12 @@ import Content_ from "./components/content"
 // const axios = require("axios").default;
 
 const AdminUser = () => {
-  return (
-    <div>
+  const role = localStorage.getItem("role")
+  if (role != 0) {
+    return window.location = "/"
+  }else {
+    return (
+      <div>
       <Layout>
         <SideBar></SideBar>
         <Layout style={{ marginLeft: "15%" }}>
@@ -21,6 +25,7 @@ const AdminUser = () => {
       </Layout>
     </div>
   );
+}
 };
 
 export default AdminUser;

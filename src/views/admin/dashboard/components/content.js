@@ -27,7 +27,19 @@ const Content_ = () => {
       </div>
       <Divider></Divider>
       <div style={{marginTop:"10%"}}>
-        <Row justify="space-around">
+        <Row>
+          <Col style={{textAlign:"center", margin:"0 auto"}}>
+          <h1>Admin dashboard</h1>
+          </Col>
+          
+        </Row>
+        <Row>
+          <Col style={{textAlign:"center", margin:"0 auto"}}>
+          <h1>Coming soon</h1>
+          </Col>
+          
+        </Row>
+        {/* <Row justify="space-around">
           <Col span={7}>
             <NumberCard
             icon={<UserOutlined />}
@@ -58,7 +70,7 @@ const Content_ = () => {
               number={12}
             ></NumberCard>
           </Col>
-        </Row>
+        </Row> */}
       </div>
     </div>
   );

@@ -20,6 +20,7 @@ import {
   
   
   const { Content } = Layout;
+  const { TextArea } = Input
   
   
   const formItemLayout = {
@@ -34,6 +35,10 @@ import {
   const FormItem = Form.Item;
   
   const DetailCve = () => {
+    const [name, setName] = useState("");
+    const [des, setDes] = useState("");
+    const [update, setUpdate] = useState(false);
+
     let { id } = useParams();
     if (id == null){
       window.location = "/admin/"
@@ -63,17 +68,16 @@ import {
         mode: "cors",
         headers: {
           "Content-Type": "application/json",
-          Authorization: "Bearer " + token,
         },
       })
         .then((res) => {
           setLoading(false);
           console.log(res.data);
-          // if (res.data.status_code == 1) {
-          //   setData(res.data.pluginInfo);
-          // } else {
-          //   setData();
-          // }
+          if (res.data.status_code == 1) {
+            setData(res.data.cveInfo);
+          } else {
+            setData();
+          }
         })
         .catch((err) => {
           // if (err.response.status == 401) {
@@ -88,38 +92,88 @@ import {
           // }
         });
     };
-  
-  
-    const onCancel = () => {
-      setVisible(false);
-    };
-  
-    const onOk = () => {
-      setVisible(false);
-    };
-  
-    const onSubmit = (e) => {
-      console.log(e);
-    };
-  
-    const handleRef = (refString) => {
-      const x = refString.Split(" ")
-      let store = 
-      x.forEach(ref => {
-  
-      })
+
+     
+  const handleUpdate = () => {
+    setLoading(true);
+    setUpdate(false)
+    const token = localStorage.getItem("accessToken");
+    if (token == null || token == "") {
+      window.location = "/";
+      return false;
     }
+    let nameC, desC,  numbC
+    if (name == "") {
+      nameC = data.cveName
+    }else {
+      nameC = name
+    }
+    if (des == "") {
+      desC = data.des
+    }else {
+      desC = des
+    }
+
+
+    const dataUpdate = {
+      cveId: data.cveId,
+      cveName: nameC,
+      des: desC,
+    }
+
+    axios({
+      method: "POST",
+      url:
+        config.API_URL + config.API_VR + `tasks/cve/update`,
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+      data:dataUpdate
+    })
+      .then((res) => {
+        // setLoading(false);
+        console.log(res.data);
+        if (res.data.status_code == 1) {
+          notification.open({
+            message: "Thông báo ",
+            description: "Cập nhật thành công",
+          });
+        } else {
+          notification.open({
+            message: "Thông báo",
+            description: "Cập nhật thất bại",
+          });
+        }
+        fetch({});
+      })
+      .catch((err) => {
+        console.log(err)
+        // if (err.response.status == 401) {
+        //   window.location.href = "/";
+        // } else {
+        setLoading(false);
+        setData([]);
+        notification.open({
+          message: "Thông báo lỗi",
+          description: "Vui lòng thử lại sau",
+        });
+        // }
+      });
+  };
+
   
     return (
       <div>
-        <Layout>
-          <SideBar></SideBar>
-          <Layout style={{ marginLeft: "15%" }}>
-            <Header_></Header_>
-            <Content
-              style={{ height: "80vh", margin: "2%", backgroundColor: "white" }}
-            >
-              <Spin spinning={loading}>
+      <Layout>
+        <SideBar></SideBar>
+        <Layout style={{ marginLeft: "15%" }}>
+          <Header_></Header_>
+          <Content
+            style={{ margin: "2%", backgroundColor: "white" }}
+          >
+            <Spin spinning={loading}>
               <div
                 style={{
                   marginRight: "10px",
@@ -135,118 +189,73 @@ import {
               </div>
               <Divider></Divider>
               {data && (
-                <div style={{ marginLeft: "3%", marginRight:"3%", textAlign:"justify" }}>
-                <h1>
-                  <b>Tên:</b><p>{data.pluginName}</p>
-                </h1>
-                <h1>
-                  <b>Mức độ: </b><p>
-                  {data.risk}
-                  </p>
-  
-                </h1>
-                <h1>
-                  <b>CWE: </b><p>
-                  {data.cweId}
-                  </p>
-                </h1>
-                <h1>
-                  <b>Mô tả: </b><p>
-                  {data.description}
-                  </p>
-                </h1>
-                <h1>
-                  <b>Giải pháp: </b><p>
-                  {data.solution}
-                  </p>
-                </h1>
-                <h1>
-                  <b>Tham khảo: </b><p>
-                  {data.reference}
-                  </p>
-                </h1>
-              </div>
+                <div
+                  style={{
+                    marginLeft: "3%",
+                    marginRight: "3%",
+                    textAlign: "justify",
+                  }}
+                >
+                  <h1>
+                    <b>Tên:</b>
+                    <br></br>
+                    {update ? (
+                      <Input defaultValue={data.cveName} onChange={(e) => setName(e.target.value)}></Input>
+                    ) : (
+                      <p>{data.cveName}</p>
+                    )}
+                  </h1>
+                  <h1>
+                    <b>Number:</b>
+                    <br></br>
+                    {update ? (
+                      <Input defaultValue={data.cveNumber} onChange={(e) => setName(e.target.value)}></Input>
+                    ) : (
+                      <p>{data.cveNumber}</p>
+                    )}
+                  </h1>
+                
+                  <h1>
+                    <b>CVE ID: </b>
+                    <p >{data.cveId}</p>
+                  </h1>
+                  <h1>
+                    <b>Mô tả: </b>
+                    <br></br>
+                    {update ? (
+                      <TextArea rows={4} defaultValue={data.des} name="des" onChange={(e) => {setDes(e.target.value)}}/>
+                    ) : (
+                      <p>{data.des}</p>
+                    )}
+                  </h1>
+                </div>
               )}
-              
+
               <Divider></Divider>
-              <div style={{ marginLeft: "3%" }}>
-                <Button
+              <div style={{ marginLeft: "3%", marginBottom:"5%"}}>
+                {update ? (<Button
                   type="primary"
                   onClick={() => {
-                    setVisible(true);
+                    handleUpdate()
+                  }}
+                >
+                  Lưu
+                </Button>) : <Button
+                  type="primary"
+                  onClick={() => {
+                    setUpdate(true);
                   }}
                 >
                   Cập nhật
-                </Button>
+                </Button>}
+                
               </div>
-              <Modal
-                visible={visible}
-                title="Đổi mật khẩu"
-                onCancel={onCancel}
-                loading={loading}
-                footer={[
-                  <Button key="back" onClick={onCancel}>
-                    Hủy
-                  </Button>,
-                  <Button
-                    key="submit"
-                    type="primary"
-                    loading={loading}
-                    form="myForm"
-                    htmlType="submit"
-                  >
-                    Đổi mật khẩu
-                  </Button>,
-                ]}
-              >
-                <Form
-                  name="control-ref"
-                  layout="horizontal"
-                  id="myForm"
-                  onFinish={onSubmit}
-                  form={form}
-                >
-                  <FormItem
-                    name="currentPassword"
-                    rules={[
-                      { required: true, message: "Yêu cầu nhập trường này!" },
-                    ]}
-                    label={`Mật khẩu hiện tại`}
-                    hasFeedback
-                    {...formItemLayout}
-                  >
-                    <Input></Input>
-                  </FormItem>
-                  <FormItem
-                    name="newPassword"
-                    rules={[
-                      { required: true, message: "Yêu cầu nhập trường này!" },
-                    ]}
-                    label={`Mật khẩu mới`}
-                    hasFeedback
-                    {...formItemLayout}
-                  >
-                    <Input></Input>
-                  </FormItem>
-                  <FormItem
-                    name="confirmPassword"
-                    rules={[
-                      { required: true, message: "Yêu cầu nhập trường này!" },
-                    ]}
-                    label={`Nhập lại mật khẩu`}
-                    hasFeedback
-                    {...formItemLayout}
-                  >
-                    <Input></Input>
-                  </FormItem>
-                </Form>
-              </Modal>
-              </Spin>
-            </Content>
-            <Footer_></Footer_>
-          </Layout>
+            </Spin>
+          </Content>
+          <Footer_></Footer_>
         </Layout>
-      </div>
+      </Layout>
+    </div>
     );
   };
   
