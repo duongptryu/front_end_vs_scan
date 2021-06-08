@@ -19,7 +19,7 @@ const Header_ = () => {
     <h1>VSCANNER</h1>
   ]
 
-  const [user, setUser] = useState({name:"unknow"})
+  const [user, setUser] = useState({name:"unknown"})
 
   useEffect(() => {
     getUser()
@@ -42,10 +42,10 @@ const Header_ = () => {
     })
       .then((res) => {
         console.log(res)
-        setUser({name:res.data.fullName})
+        setUser({name:res.data.userInfo.fullName})
       })
       .catch((err) => {
-        // window.location = "/signin"
+        window.location = "/signin"
         return false;
       });
   };
@@ -53,7 +53,8 @@ const Header_ = () => {
   const logOut = () => {
     setUser({})
     localStorage.removeItem("accessToken")
-    window.location = "/signin"
+    localStorage.removeItem("role")
+    window.location = "/"
   }
 
   const rightContent = [

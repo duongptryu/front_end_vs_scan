@@ -80,16 +80,16 @@ import {
           }
         })
         .catch((err) => {
-          // if (err.response.status == 401) {
-          //   window.location.href = "/";
-          // } else {
+          if (err.response.status == 401) {
+            window.location.href = "/";
+          } else {
           setLoading(false);
           setData([]);
           notification.open({
             message: "Thông báo lỗi",
             description: "Vui lòng thử lại sau",
           });
-          // }
+          }
         });
     };
 
@@ -150,16 +150,16 @@ import {
       })
       .catch((err) => {
         console.log(err)
-        // if (err.response.status == 401) {
-        //   window.location.href = "/";
-        // } else {
+        if (err.response.status == 401) {
+          window.location.href = "/";
+        } else {
         setLoading(false);
         setData([]);
         notification.open({
           message: "Thông báo lỗi",
           description: "Vui lòng thử lại sau",
         });
-        // }
+        }
       });
   };
 

@@ -16,7 +16,7 @@ const SignUp = () => {
 
   useEffect(() => {
     document.title = "Đăng ký";
-    checkUser();
+    // checkUser();
   });
 
   const checkUser = () => {
@@ -36,6 +36,7 @@ const SignUp = () => {
       },
     })
       .then((res) => {
+        setLoading(false);
         console.log(res);
         window.location = "/dashboard";
         return false;

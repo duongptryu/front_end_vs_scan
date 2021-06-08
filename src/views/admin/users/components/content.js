@@ -101,16 +101,16 @@ const Content_ = () => {
         }
       })
       .catch((err) => {
-        // if (err.response.status == 401) {
-        //   window.location.href = "/";
-        // } else {
+        if (err.response.status == 401) {
+          window.location.href = "/";
+        } else {
         setLoading(false);
         setData([]);
         notification.open({
           message: "Thông báo lỗi",
           description: "Vui lòng thử lại sau",
         });
-        // }
+        }
       });
   };
 
@@ -232,28 +232,31 @@ const Content_ = () => {
       .then((res) => {
         setLoading(false);
         console.log(res.data);
-        // if (res.data.status_code == 1) {
-        //   setData(res.data.allusers.activeUsers);
-        //   setPagination({
-        //     ...params.pagination,
-        //     total: res.data.allusers.activeUsers.length,
-        //   });
-        //   console.log(data);
-        // } else {
-        //   setData([]);
-        // }
+        if (res.data.status_code == 1) {
+          notification.open({
+            message: "Thông báo",
+            description: "Block thành công",
+          });
+        } else {
+          notification.open({
+            message: "Thông báo",
+            description: "Block thất bại",
+          });
+        }
+        fetch({ pagination });
       })
       .catch((err) => {
-        // if (err.response.status == 401) {
-        //   window.location.href = "/";
-        // } else {
+        if (err.response.status == 401) {
+          window.location.href = "/";
+        } else {
         setLoading(false);
         setData([]);
         notification.open({
           message: "Thông báo lỗi",
           description: "Vui lòng thử lại sau",
         });
-        // }
+        }
+        fetch({ pagination });
       });
   };
 
@@ -282,28 +285,30 @@ const Content_ = () => {
       .then((res) => {
         setLoading(false);
         console.log(res.data);
-        // if (res.data.status_code == 1) {
-        //   setData(res.data.allusers.activeUsers);
-        //   setPagination({
-        //     ...params.pagination,
-        //     total: res.data.allusers.activeUsers.length,
-        //   });
-        //   console.log(data);
-        // } else {
-        //   setData([]);
-        // }
+        if (res.data.status_code == 1) {
+          notification.open({
+            message: "Thông báo",
+            description: "UnBlock thành công",
+          });
+        } else {
+          notification.open({
+            message: "Thông báo",
+            description: "UnBlock thất bại",
+          });
+        }
       })
       .catch((err) => {
-        // if (err.response.status == 401) {
-        //   window.location.href = "/";
-        // } else {
+        if (err.response.status == 401) {
+          window.location.href = "/";
+        } else {
         setLoading(false);
         setData([]);
         notification.open({
           message: "Thông báo lỗi",
           description: "Vui lòng thử lại sau",
         });
-        // }
+        }
+        fetch({ pagination });
       });
   };
 

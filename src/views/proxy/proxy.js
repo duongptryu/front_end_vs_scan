@@ -15,7 +15,7 @@ import Header_ from "../dashboard/components/header";
 import Footer_ from "../dashboard/components/footer";
 import { Redirect } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { SearchOutlined } from "@ant-design/icons";
+import { SearchOutlined, SecurityScanOutlined } from "@ant-design/icons";
 import config from "../../config";
 const axios = require("axios").default;
 
@@ -26,6 +26,10 @@ const Proxy = () => {
   const [cve, setCve] = useState([]);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
+  const [cveId, setCveId] = useState("")
+  const [target, setTarget] = useState("")
+  const [checked, setChecked] = useState(false)
+
 
   useEffect(() => {
     document.title = "Proxy Notfound";
@@ -49,6 +53,7 @@ const Proxy = () => {
     })
       .then((res) => {
         setLoading(false);
+        console.log(res)
         if (res.data.status_code != 1) {
           notification.open({
             message: "Thông báo lỗi",
@@ -61,16 +66,143 @@ const Proxy = () => {
       .catch((err) => {
         console.log(err);
         setLoading(false);
-        if (err.response.status == 401) {
-          window.location = "/signin";
-        } else {
+        // if (err.response.status == 401) {
+        //   window.location = "/signin";
+        // } else {
           notification.open({
             message: "Thông báo lỗi",
-            description: err.response.data,
+            description: "Vui lòng thử lại sau",
           });
-        }
+        // }
       });
   };
+
+  const handleChange = (e) => {
+    if (e == "default") {
+      return
+    }
+    setCveId(e)
+    cve.forEach(c => {
+      if (c.cveId == e) {
+        document.querySelector("#des").innerHTML = c.des
+        return
+      }
+    })
+   
+  }
+
+  const check = () => {
+    console.log(cveId)
+    console.log(target)
+    const dataNew = {
+      cveId: cveId,
+      target: target,
+      type: 0
+    }
+
+    const token = localStorage.getItem("accessToken");
+    if (token == null || !token) {
+      window.location = "/signin";
+    }
+    setLoading(true);
+    axios({
+      method: "POST",
+      url: config.API_URL + config.API_VR + `tasks/cve/check`,
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+      data:dataNew
+    })
+      .then((res) => {
+        setLoading(false);
+        setChecked(false)
+        console.log(res)
+        if (res.data.status_code != 1) {
+          notification.open({
+            message: "Thông báo",
+            description: "Quét thành công",
+          });
+          setResult(res.data.results)
+        }else {
+          notification.open({
+            message: "Thông báo",
+            description: "Quét thành công",
+          });
+          setResult([])
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoading(false);
+        // if (err.response.status == 401) {
+        //   window.location = "/signin";
+        // } else {
+          notification.open({
+            message: "Thông báo lỗi",
+            description: "Vui lòng thử lại sau",
+          });
+        // }
+      });
+  }
+
+  
+  const checkAll = () => {
+    console.log(cveId)
+    console.log(target)
+    const dataNew = {
+      cveId: cveId,
+      target: target,
+      type: 1
+    }
+
+    const token = localStorage.getItem("accessToken");
+    if (token == null || !token) {
+      window.location = "/signin";
+    }
+    setLoading(true);
+    axios({
+      method: "POST",
+      url: config.API_URL + config.API_VR + `tasks/cve/check`,
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+      data:dataNew
+    })
+      .then((res) => {
+        setLoading(false);
+        setChecked(false)
+        console.log(res)
+        if (res.data.status_code != 1) {
+          notification.open({
+            message: "Thông báo",
+            description: "Quét thành công",
+          });
+          setResult(res.data.results)
+        }else {
+          notification.open({
+            message: "Thông báo",
+            description: "Quét thành công",
+          });
+          setResult([])
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoading(false);
+        // if (err.response.status == 401) {
+        //   window.location = "/signin";
+        // } else {
+          notification.open({
+            message: "Thông báo lỗi",
+            description: "Vui lòng thử lại sau",
+          });
+        // }
+      });
+  }
 
   return (
     <div>
@@ -88,7 +220,10 @@ const Proxy = () => {
             >
               <div style={{ marginTop: "20px" }}>
                 <Row>
-                  <Col span={24}>0-day checking / </Col>
+                  <Space>
+                  <SecurityScanOutlined />
+                  <Col span={24} >0-day checking / </Col>
+                  </Space>
                 </Row>
               </div>
 
@@ -104,7 +239,7 @@ const Proxy = () => {
                   <Col span={24} style={{ textAlign: "center" }}>
                     <h1>0-day Checking</h1>
                     <h1>PROXY NOTFOUND</h1>
-                    <p>description</p>
+                    <p id="des"></p>
                   </Col>
                 </Row>
                 <Divider></Divider>
@@ -119,11 +254,14 @@ const Proxy = () => {
                   <Col span={6}>
                     {cve.length > 0 && (
                       <Select
-                        defaultValue={cve[0].cveId}
+                        defaultValue="default"
                         style={{ width: "100%" }}
-                        //   onChange={handleChange}
+                        onChange={handleChange}
                         size="large"
                       >
+                        <Option value="default">
+                              Vui lòng chọn CVE
+                            </Option>
                         {cve.map((cve) => {
                           return (
                             <Option value={cve.cveId}>
@@ -139,34 +277,71 @@ const Proxy = () => {
                       size="large"
                       placeholder="Domain"
                       prefix={<SearchOutlined />}
+                      onChange={(e) => {setTarget(e.target.value)}}
                     />
                   </Col>
                   <Col span={2} style={{textAlign:"left", marginLeft:"1%"}}>
-                    <Button type="primary" size="large">
+                    <Button type="primary" size="large" onClick={check}>
                       Checking
                     </Button>
                   </Col>
                   <Col span={5} style={{textAlign:"left"}}>
-                    <Button type="primary" size="large" >
+                    <Button type="primary" size="large" onClick={checkAll}>
                       Checking All
                     </Button>
                   </Col>
                 </Row>
                 <br></br>
+                <Divider>Result</Divider>
                 {result != null && (
-                  <div>
-                    <Divider orientation="left">Result</Divider>
-                    <Row>
-                      <Space direction="vertical">
-                        <h3>Kết quả: </h3>
-                        <h3>Các domain bị: </h3>
-                        <h3>Các domain nghi ngờ: </h3>
-                        <h3>Các domain an toàn: </h3>
-                        <h3>Các domain không kết nối:</h3>
-                      </Space>
-                    </Row>
-                  </div>
-                )}
+                <div
+                  style={{
+                    marginLeft: "3%",
+                    marginRight: "3%",
+                    textAlign: "justify",
+                  }}
+                >
+                  <h3>
+                    <b>Các domain bị:</b>
+                    <br></br>
+                    <Space>
+
+                    {checked ?  (result.yes.map(domain => {
+                      return <p>{domain}</p>
+                    })): "None"}
+                    </Space>
+                  </h3>
+                  <h3>
+                    <b>Các domain nghi ngờ:</b>
+                    <br></br>
+                    <Space>
+
+                    {checked ?  (result.potenial.map(domain => {
+                      return <p>{domain}</p>
+                    })): "None"}
+                    </Space>
+                  </h3>
+                
+                  <h3>
+                    <b>Các domain an toàn: </b>
+                    <br></br>
+                    <Space>
+                    {checked ?  (result.no.map(domain => {
+                      return <p>{domain}</p>
+                    })): "None"}
+                    </Space>
+                  </h3>
+                  <h3>
+                    <b>Các domain không kết nối: </b>
+                    <br></br>
+                    <Space>
+                    {checked ?  (result.timeout.map(domain => {
+                      return <p>{domain}</p>
+                    })): "None"}
+                    </Space>
+                  </h3>
+                </div>
+              )}
               </Content>
             </div>
           </Spin>
