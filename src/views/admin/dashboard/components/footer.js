@@ -6,7 +6,7 @@ const { Footer } = Layout;
 const Footer_ = () => {
   return (
     <>
-    <Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Footer>
+    <Footer style={{ textAlign: 'center' }}>Chu Duy Tuong ©2020 Fighting</Footer>
     </>
   );
 };
