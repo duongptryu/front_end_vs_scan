@@ -232,30 +232,45 @@ const Content_ = () => {
   const menuAction = (target) => {
     if (target.scanStatus == "processing" || target.scanStatus == "running") {
       return (
-        <Menu theme="light">
-          <Menu.Item key="1">
-            <Button
-              type="primary"
-              onClick={() => {
-                handlePaused(target);
-              }}
-              style={{ width: "100%" }}
+        <Space direction="horizontal">
+          <Button
+            type="text"
+            onClick={() => {
+              handlePaused(target);
+            }}
+            style={{ width: "100%" }}
             >
-              <PauseCircleOutlined /> Pause
-            </Button>
-          </Menu.Item>
-          <Menu.Item key="2">
-            <Button
-              type="primary"
-              onClick={() => {
-                handleStop(target);
-              }}
-              style={{ width: "100%" }}
+            <PauseCircleOutlined />
+          </Button>
+          <Button
+            type="text"
+            onClick={() => {
+              handleStop(target);
+            }}
+            style={{ width: "100%" }}
             >
-              <StopOutlined /> Stop
-            </Button>
-          </Menu.Item>
-        </Menu>
+            <StopOutlined />
+          </Button>
+          <Button
+          type="text"
+          onClick={() => {
+            startScan(target);
+          }}
+          disabled
+        >
+          <SecurityScanOutlined />
+        </Button>
+        <Button
+            type="text"
+            onClick={() => {
+              handleResume(target);
+            }}
+            style={{ width: "80%" }}
+            disabled
+          >
+            <CaretRightOutlined />
+          </Button>
+            </Space>
       );
     } else if (
       target.scanStatus == "pending" ||
@@ -263,47 +278,90 @@ const Content_ = () => {
       target.scanStatus == "cancel"
     ) {
       return (
-        <Menu theme="light">
-          <Menu.Item key="1">
-            <Button
-              type="primary"
-              onClick={() => {
-                startScan(target);
-              }}
+        <Space direction="horizontal">
+          <Button
+            type="text"
+            onClick={() => {
+              handlePaused(target);
+            }}
+            style={{ width: "100%" }}
+            disabled
             >
-              <SecurityScanOutlined /> Scan
-            </Button>
-          </Menu.Item>
-        </Menu>
+            <PauseCircleOutlined />
+          </Button>
+          <Button
+            type="text"
+            onClick={() => {
+              handleStop(target);
+            }}
+            style={{ width: "100%" }}
+            disabled
+            >
+            <StopOutlined />
+          </Button>
+          <Button
+          type="text"
+          onClick={() => {
+            startScan(target);
+          }}
+        
+        >
+          <SecurityScanOutlined />
+        </Button>
+        <Button
+            type="text"
+            onClick={() => {
+              handleResume(target);
+            }}
+            style={{ width: "80%" }}
+            disabled
+          >
+            <CaretRightOutlined />
+          </Button>
+            </Space>
       );
     } else {
       return (
-        <div>
-          <Menu theme="light">
-            <Menu.Item key="1">
-              <Button
-                type="primary"
-                onClick={() => {
-                  handleStop(target);
-                }}
-                style={{ width: "100%" }}
-              >
-                <StopOutlined /> Stop
-              </Button>
-            </Menu.Item>
-            <Menu.Item key="1">
-              <Button
-                type="primary"
-                onClick={() => {
-                  handleResume(target);
-                }}
-                style={{ width: "80%" }}
-              >
-                <CaretRightOutlined /> Resume
-              </Button>
-            </Menu.Item>
-          </Menu>
-        </div>
+        <Space direction="horizontal">
+        <Button
+          type="text"
+          onClick={() => {
+            handlePaused(target);
+          }}
+          style={{ width: "100%" }}
+          disabled
+          >
+          <PauseCircleOutlined />
+        </Button>
+        <Button
+          type="text"
+          onClick={() => {
+            handleStop(target);
+          }}
+          style={{ width: "100%" }}
+          >
+          <StopOutlined />
+        </Button>
+        <Button
+        type="text"
+        onClick={() => {
+          startScan(target);
+        }}
+        disabled 
+      >
+        <SecurityScanOutlined />
+      </Button>
+      <Button
+          type="text"
+          onClick={() => {
+            handleResume(target);
+          }}
+          style={{ width: "80%" }}
+          
+        >
+          <CaretRightOutlined />
+        </Button>
+          </Space>
       );
     }
   };
@@ -685,19 +743,17 @@ const Content_ = () => {
       render: (target) => {
         return (
           <Space>
-            <Dropdown overlay={menuAction(target)}>
-              <Button type="text" disabled>
-                <UnorderedListOutlined />
+            <div>
+              {menuAction(target)}
+              <Button
+                type="text"
+                onClick={() => {
+                  handleDeleteDomain(target);
+                }}
+              >
+                <DeleteOutlined />
               </Button>
-            </Dropdown>
-            <Button
-              type="text"
-              onClick={() => {
-                handleDeleteDomain(target);
-              }}
-            >
-              <DeleteOutlined />
-            </Button>
+            </div>
           </Space>
         );
       },
