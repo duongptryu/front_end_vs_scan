@@ -169,23 +169,12 @@ const Content_ = () => {
       render: (target) => {
         return (
           <Space>
-            <Button
+            <Link to={"/admin/plugin/detail/" + target.pluginId}><Button
               type="primary"
               style={{ width:"100%" }}
             >
               Sửa
-            </Button>
-            <Popconfirm
-              title="Bạn có chắc muốn xóa plugin này?"
-              onConfirm={confirm}
-              onCancel={cancel}
-              okText="Có"
-              cancelText="Không"
-            >
-              <Button type="primary" style={{ width: "100%" }}>
-              Xóa
-            </Button>
-            </Popconfirm>
+            </Button></Link>
           </Space>
         );
       },

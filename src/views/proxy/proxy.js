@@ -117,9 +117,8 @@ const Proxy = () => {
     })
       .then((res) => {
         setLoading(false);
-        setChecked(false)
-        console.log(res)
-        if (res.data.status_code != 1) {
+        setChecked(true)
+        if (res.data.status_code == 1) {
           notification.open({
             message: "Thông báo",
             description: "Quét thành công",
@@ -130,12 +129,15 @@ const Proxy = () => {
             message: "Thông báo",
             description: "Quét thành công",
           });
-          setResult([])
+          setResult(null)
         }
+        console.log(result)
       })
       .catch((err) => {
         console.log(err);
         setLoading(false);
+        setChecked(false)
+        setResult(null)
         // if (err.response.status == 401) {
         //   window.location = "/signin";
         // } else {
@@ -174,9 +176,9 @@ const Proxy = () => {
     })
       .then((res) => {
         setLoading(false);
-        setChecked(false)
+        setChecked(true)
         console.log(res)
-        if (res.data.status_code != 1) {
+        if (res.data.status_code == 1) {
           notification.open({
             message: "Thông báo",
             description: "Quét thành công",
@@ -187,12 +189,14 @@ const Proxy = () => {
             message: "Thông báo",
             description: "Quét thành công",
           });
-          setResult([])
+          setResult(null)
         }
       })
       .catch((err) => {
         console.log(err);
         setLoading(false);
+        setChecked(false)
+        setResult(null)
         // if (err.response.status == 401) {
         //   window.location = "/signin";
         // } else {
@@ -232,7 +236,7 @@ const Proxy = () => {
                   marginTop: "20px",
                   backgroundColor: "white",
                   padding: "20px",
-                  height: "100%",
+                  height: "80vh",
                 }}
               >
                 <Row>
@@ -304,20 +308,19 @@ const Proxy = () => {
                   <h3>
                     <b>Các domain bị:</b>
                     <br></br>
-                    <Space>
-
-                    {checked ?  (result.yes.map(domain => {
-                      return <p>{domain}</p>
+                    <Space direction="vertical">
+                    {result.yes.length > 0 ?  (result.yes.map(domain => {
+                      return <li>{domain}</li>
                     })): "None"}
                     </Space>
                   </h3>
                   <h3>
                     <b>Các domain nghi ngờ:</b>
                     <br></br>
-                    <Space>
+                    <Space direction="vertical">
 
-                    {checked ?  (result.potenial.map(domain => {
-                      return <p>{domain}</p>
+                    {result.potenial.length > 0 ?  (result.potenial.map(domain => {
+                      return <li>{domain}</li>
                     })): "None"}
                     </Space>
                   </h3>
@@ -325,18 +328,18 @@ const Proxy = () => {
                   <h3>
                     <b>Các domain an toàn: </b>
                     <br></br>
-                    <Space>
-                    {checked ?  (result.no.map(domain => {
-                      return <p>{domain}</p>
+                    <Space direction="vertical">
+                    {result.no.length > 0 ?  (result.no.map(domain => {
+                      return <li>{domain}</li>
                     })): "None"}
                     </Space>
                   </h3>
                   <h3>
                     <b>Các domain không kết nối: </b>
                     <br></br>
-                    <Space>
-                    {checked ?  (result.timeout.map(domain => {
-                      return <p>{domain}</p>
+                    <Space direction="vertical">
+                    {result.timeout.length > 0 ?  (result.timeout.map(domain => {
+                      return <li>{domain}</li>
                     })): "None"}
                     </Space>
                   </h3>
@@ -345,7 +348,7 @@ const Proxy = () => {
               </Content>
             </div>
           </Spin>
-          <Footer_></Footer_>
+          {/* <Footer_></Footer_> */}
         </Layout>
       </Layout>
     </div>
