@@ -164,9 +164,8 @@ const Content_ = () => {
                 onClick={() => {
                   block(target.userId);
                 }}
-                disabled
               >
-                Block
+                Khóa
               </Button>
                 <Button
                 type="primary"
@@ -174,8 +173,9 @@ const Content_ = () => {
                 onClick={() => {
                   unblock(target.userId);
                 }}
+                disabled
               >
-                UnBlock
+                Mở khóa
               </Button>
                  </Space>
             ) : (
@@ -186,8 +186,9 @@ const Content_ = () => {
                 onClick={() => {
                   block(target.userId);
                 }}
+                disabled
               >
-                Block
+                Khóa
               </Button>
                 <Button
                 type="primary"
@@ -195,9 +196,8 @@ const Content_ = () => {
                 onClick={() => {
                   unblock(target.userId);
                 }}
-                disabled
               >
-                UnBlock
+                Mở khóa
               </Button>
                  </Space>
             )

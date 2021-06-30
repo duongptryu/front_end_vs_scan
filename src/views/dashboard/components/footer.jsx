@@ -6,7 +6,7 @@ const { Footer } = Layout;
 const Footer_ = () => {
   return (
     <>
-    <Footer style={{ textAlign: 'center' }}>Chu Duy Tuong ©2020 Fighting</Footer>
+    <Footer style={{ textAlign: 'center' }}>Copyright ©2021 VSCANNER - Power by ZAP</Footer>
     </>
   );
 };

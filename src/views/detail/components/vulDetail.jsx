@@ -115,7 +115,7 @@ const VulDetail = (props) => {
             <br />
           </Space>
           <Divider/>
-          <h1 style = {{fontSize:"25px"}}>Các điểm bị ảnh hưởng</h1>
+          <h1 style = {{fontSize:"25px"}}>Danh sách các endpoints phát hiện tồn tại lỗ hổng</h1>
           <div>
           {effectedDomain.map((target) => {
             return (

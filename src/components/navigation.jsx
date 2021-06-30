@@ -43,11 +43,6 @@ export const Navigation = (props) => {
               </a>
             </li>
             <li>
-              <a href='/#contact' className='page-scroll'>
-                Liên hệ
-              </a>
-            </li>
-            <li>
               <div className='col-md-8 col-md-offset-2 intro-text'>
                 <a href='/signin' className='btn btn-custom-signup btn-lg page-scroll'>
                     Đăng nhập

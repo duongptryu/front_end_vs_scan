@@ -36,9 +36,9 @@ const SideBar = () => {
           </a>
         </div>
         <Menu theme="dark" mode="inline">
-          <Menu.Item key="1" icon={<DashboardOutlined />}>
-            <Link to="/admin/dashboard">Dashboard</Link>
-          </Menu.Item>
+          {/* <Menu.Item key="1" icon={<DashboardOutlined />}> */}
+            {/* <Link to="/admin/dashboard">Dashboard</Link> */}
+          {/* </Menu.Item> */}
           <Menu.Item key="2" icon={<TableOutlined />}>
             <Link to="/admin/plugin">Quản lý plugin</Link>
           </Menu.Item>

@@ -15,7 +15,6 @@ export const Header = (props) => {
                   href='/signup'
                   className='btn btn-custom btn-lg page-scroll'
                 >
-
                   Đăng ký ngay
                 </a>{' '}
               </div>

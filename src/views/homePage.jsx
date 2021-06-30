@@ -19,8 +19,8 @@ const HomePage = () => {
       <Header data={landingPageData.Header} />
       <About data={landingPageData.About} />
       <Services data={landingPageData.Services} />
-      <Team data={landingPageData.Team} />
-      <Contact data={landingPageData.Contact} />
+      {/* <Team data={landingPageData.Team} /> */}
+      {/* <Contact data={landingPageData.Contact} /> */}
     </div>
   );
 };

@@ -56,7 +56,7 @@ const AdminSignIn = () => {
             message: "Thông báo",
             description: "Xác thực thành công",
           });
-          window.location = "/admin/dashboard"
+          window.location = "/admin/plugin"
         }
       })
       .catch((err) => {
@@ -85,7 +85,7 @@ const AdminSignIn = () => {
       },
     })
       .then((res) => {
-        window.location = "/admin/dashboard";
+        window.location = "/admin/plugin";
         return false;
       })
       .catch((err) => {

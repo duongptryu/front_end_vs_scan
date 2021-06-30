@@ -320,7 +320,49 @@ const Content_ = () => {
           </Button>
             </Space>
       );
-    } else {
+    }     if (target.scanStatus == "processing" || target.scanStatus == "running") {
+      return (
+        <Space direction="horizontal">
+          <Button
+            type="text"
+            onClick={() => {
+              handlePaused(target);
+            }}
+            style={{ width: "100%" }}
+            >
+            <PauseCircleOutlined />
+          </Button>
+          <Button
+            type="text"
+            onClick={() => {
+              handleStop(target);
+            }}
+            style={{ width: "100%" }}
+            >
+            <StopOutlined />
+          </Button>
+          <Button
+          type="text"
+          onClick={() => {
+            startScan(target);
+          }}
+          disabled
+        >
+          <SecurityScanOutlined />
+        </Button>
+        <Button
+            type="text"
+            onClick={() => {
+              handleResume(target);
+            }}
+            style={{ width: "80%" }}
+            disabled
+          >
+            <CaretRightOutlined />
+          </Button>
+            </Space>
+      );
+    }else {
       return (
         <Space direction="horizontal">
         <Button
@@ -682,7 +724,7 @@ const Content_ = () => {
     },
     {
       title: "Xác thực",
-      width: "10%",
+      width: "5%",
       align: "center",
       sorter: (a, b) => {
         return a.isVerify - b.isVerify;
@@ -727,7 +769,7 @@ const Content_ = () => {
     {
       title: "Trạng thái",
       dataIndex: "scanStatus",
-      width: "15%",
+      width: "10%",
       align: "center",
       sorter: (a, b) => {
         return a.scanStatus.localeCompare(b.scanStatus);
@@ -735,7 +777,7 @@ const Content_ = () => {
     },
     {
       title: "Tùy chọn",
-      width: "20%",
+      width: "30%",
       align: "center",
       sorter: (a, b) => {
         return a.scanStatus.localeCompare(b.scanStatus);
@@ -1327,8 +1369,8 @@ const Content_ = () => {
                 </Button>
               </Space>
             </Col>
-            <Col span={6} style={{ display: "flex" }}>
-              <Space style={{ float: "right" }}>
+            <Col span={7} style={{ display: "flex" }}>
+              <Space style={{ float: "left" }}>
                 <Search
                   placeholder="input search text"
                   enterButton="Search"

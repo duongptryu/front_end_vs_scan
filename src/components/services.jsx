@@ -3,10 +3,9 @@ export const Services = (props) => {
     <div id='services' className='text-center'>
       <div className='container'>
         <div className='section-title'>
-          <h2>Our Services</h2>
+          <h2>DỊCH VỤ CỦA CHÚNG TÔI</h2>
           <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit duis sed
-            dapibus leonec.
+            Chúng tôi cung cấp dịch vụ quét rà soát và quản lý lỗ hổng website thời gian thực
           </p>
         </div>
         <div className='row'>

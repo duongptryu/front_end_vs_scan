@@ -40,12 +40,12 @@ const Routes = () => {
           <Route exact path="/detail-domain/:id/:time?" component={DetailDomain} />
           <Route exact path="/detail-vuln/:vulnID/:id?" component={DetailVuln} />
           <Route exact path="/user/me" component={User} />
-          <Route exact path="/admin/dashboard" component={AdminDashboard} />
+          {/* <Route exact path="/admin/dashboard" component={AdminDashboard} /> */}
           <Route exact path="/admin/plugin" component={AdminPlugin} />
-          <Route exact path="/admin" component={AdminDashboard} />
+          <Route exact path="/admin" component={AdminPlugin} />
           <Route exact path="/admin/plugin/detail/:id" component={DetailPlugin} />
           <Route exact path="/admin/users" component={AdminUser} />
-          <Route exact path="/admin/sign-in" component={AdminSignIn} />
+          <Route exact path="/admin/signin" component={AdminSignIn} />
           <Route exact path="/admin/cve" component={AdminCve} />
           <Route exact path="/admin/cve/:id" component={DetailCve} />
 

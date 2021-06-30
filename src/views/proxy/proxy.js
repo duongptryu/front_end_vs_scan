@@ -242,7 +242,7 @@ const Proxy = () => {
                 <Row>
                   <Col span={24} style={{ textAlign: "center" }}>
                     <h1>0-day Checking</h1>
-                    <h1>PROXY NOTFOUND</h1>
+                    {/* <h1>PROXY NOTFOUND</h1> */}
                     <p id="des"></p>
                   </Col>
                 </Row>
@@ -311,7 +311,7 @@ const Proxy = () => {
                     <Space direction="vertical">
                     {result.yes.length > 0 ?  (result.yes.map(domain => {
                       return <li>{domain}</li>
-                    })): "None"}
+                    })): "Không có"}
                     </Space>
                   </h3>
                   <h3>
@@ -321,7 +321,7 @@ const Proxy = () => {
 
                     {result.potenial.length > 0 ?  (result.potenial.map(domain => {
                       return <li>{domain}</li>
-                    })): "None"}
+                    })): "Không có"}
                     </Space>
                   </h3>
                 
@@ -331,7 +331,7 @@ const Proxy = () => {
                     <Space direction="vertical">
                     {result.no.length > 0 ?  (result.no.map(domain => {
                       return <li>{domain}</li>
-                    })): "None"}
+                    })): "Không có"}
                     </Space>
                   </h3>
                   <h3>
@@ -340,7 +340,7 @@ const Proxy = () => {
                     <Space direction="vertical">
                     {result.timeout.length > 0 ?  (result.timeout.map(domain => {
                       return <li>{domain}</li>
-                    })): "None"}
+                    })): "Không có"}
                     </Space>
                   </h3>
                 </div>
