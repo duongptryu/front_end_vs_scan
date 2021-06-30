@@ -9,7 +9,7 @@ import {
   Modal,
   Form,
   Input,
-  Upload,
+  Upload
 } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import SideBar from "../dashboard/components/sidebar";
@@ -50,9 +50,11 @@ const DetailCve = () => {
 
   const [fileList, setFileList] = useState([]);
 
+  
   const handleCancel = () => {
     setUploadVisiable(false);
   };
+
 
   const props = {
     onRemove: (file) => {
@@ -193,6 +195,7 @@ const DetailCve = () => {
       });
   };
 
+  
   const UploadFileCVE = (e) => {
     setLoading(true);
     const token = localStorage.getItem("accessToken");
@@ -200,13 +203,13 @@ const DetailCve = () => {
       window.location = "/signin";
       return false;
     }
-    if (fileList.length < 1) {
+    if (fileList.length < 1){
       notification.open({
         message: "Thông báo",
         description: "Cần tải lên file CVE",
       });
       setLoading(false);
-      return;
+      return
     }
     const f = new FormData();
     f.append("cveId", id);
@@ -226,17 +229,24 @@ const DetailCve = () => {
         form.resetFields();
         setLoading(false);
         setUploadVisiable(false);
-        notification.open({
-          message: "Thông báo",
-          description: "Cập nhật thành công",
-        });
+        if (res.data.status_code == 1) {
+          notification.open({
+            message: "Thông báo",
+            description: "Cập nhật thành công",
+          });
+        } else {
+          notification.open({
+            message: "Thông báo",
+            description: "Cập nhật thất bại",
+          });
+        }
       })
       .catch((err) => {
         // if (err.response.status == 401) {
         //   window.location.href = "/";
         // } else {
         setLoading(false);
-        setVisible(false);
+        setUploadVisiable(false);
         notification.open({
           message: "Thông báo lỗi",
           description: "Vui lòng thử lại sau",
@@ -346,47 +356,46 @@ const DetailCve = () => {
                 )}
                 <Button
                   style={{ marginLeft: "20px" }}
-                  onClick={() => {
-                    setUploadVisiable(true);
-                  }}
+                  onClick={() => {setUploadVisiable(true)}}
                 >
                   Cập nhật file CVE
                 </Button>
               </div>
 
               <Modal
-                visible={UploadVisiable}
-                title="Cập nhật file CVE"
-                loading={loading}
-                onCancel={handleCancel}
-                footer={[
-                  <Button key="back" onClick={handleCancel}>
-                    Hủy
-                  </Button>,
-                ]}
-              >
-                <Form
-                  form={form}
-                  {...layout}
-                  name="basic"
-                  onFinish={UploadFileCVE}
-                  onFinishFailed={handleCancel}
-                >
-                  <Form.Item style={{ marginLeft: "35%" }}>
-                    <Upload {...props} maxCount={1}>
-                      <Button size="large" icon={<UploadOutlined />}>
-                        Tải lên file CVE
-                      </Button>
-                    </Upload>
-                  </Form.Item>
+        visible={UploadVisiable}
+        title="Cập nhật file CVE"
+        loading={loading}
+        onCancel={handleCancel}
+        footer={[
+          <Button key="back" onClick={handleCancel}>
+            Hủy
+          </Button>,
+        ]}
+      >
+        <Form
+          form={form}
+          {...layout}
+          name="basic"
+          onFinish={UploadFileCVE}
+          onFinishFailed={handleCancel}
+        >
+          <Form.Item style={{marginLeft:"35%"}}
+          >
+             <Upload {...props} maxCount={1}>
+            <Button size="large" icon={<UploadOutlined />}>
+              Tải lên file CVE
+            </Button>
+          </Upload>
+          </Form.Item>
 
-                  <Form.Item {...tailLayout}>
-                    <Button type="primary" htmlType="submit">
-                      Thêm
-                    </Button>
-                  </Form.Item>
-                </Form>
-              </Modal>
+          <Form.Item {...tailLayout}>
+            <Button type="primary" htmlType="submit">
+              Thêm
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
             </Spin>
           </Content>
           <Footer_></Footer_>
