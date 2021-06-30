@@ -10,7 +10,9 @@ import {
   Modal,
   Form,
   Input,
+  Upload
 } from "antd";
+import { UploadOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import config from "../../../../config";
@@ -139,16 +141,30 @@ const Content_ = () => {
       window.location = "/signin";
       return false;
     }
-
+    if (fileList.length < 1){
+      notification.open({
+        message: "Thông báo",
+        description: "Cần tải lên file CVE",
+      });
+      setLoading(false);
+      return
+    }
+    const f = new FormData();
+    f.append("cveNumber", e.cveNumber);
+    f.append("cveName", e.cveName);
+    f.append("des", e.des);
+    f.append("pocFile", fileList[0]);
+    console.log(f)
     axios({
       method: "POST",
       url: config.API_URL + config.API_VR + `tasks/cve/add`,
       mode: "cors",
       headers: {
-        "Content-Type": "application/json",
+        // "Content-Type": "application/json",
         Authorization: "Bearer " + token,
       },
-      data: e,
+      processData: false,
+      data: f,
     })
       .then((res) => {
         form.resetFields();
@@ -179,6 +195,27 @@ const Content_ = () => {
         });
         // }
       });
+  };
+
+  const [fileList, setFileList] = useState([])
+
+  const props = {
+    onRemove: (file) => {
+      notification.open({
+        message: "Thông báo",
+        description: `${file.name} file removed successfully`,
+      });
+      setFileList([])
+    },
+    beforeUpload: (file) => {
+      notification.open({
+        message: "Thông báo",
+        description: `${file.name} file uploaded successfully`,
+      });
+      setFileList([file])
+      return false;
+    },
+    fileList,
   };
 
   return (
@@ -262,6 +299,14 @@ const Content_ = () => {
             rules={[{ required: true, message: "Vui lòng miêu tả CVE!" }]}
           >
             <TextArea />
+          </Form.Item>
+          <Form.Item style={{marginLeft:"35%"}}
+          >
+             <Upload {...props} maxCount={1}>
+            <Button size="large" icon={<UploadOutlined />}>
+              Tải lên file CVE
+            </Button>
+          </Upload>
           </Form.Item>
 
           <Form.Item {...tailLayout}>
